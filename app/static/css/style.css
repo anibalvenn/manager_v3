@@ -1,0 +1,35 @@
+.hidden {
+  display: none;
+}
+
+.selected {
+  /* Add your selected style properties here */
+  color: #087648; /* Red color for demonstration */
+  font-weight: bold;
+  background: #fff;
+}
+
+/* In your static/css/style.css file */
+.body-background {
+  background-image: url('/static/imgs/skat_foto.jpg'); /* Update with the correct path to your image in the static folder */
+  background-size: cover;
+  background-position: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.body-background::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5); /* This creates the opacity effect */
+  z-index: -1;
+}

@@ -1,0 +1,24 @@
+/my_flask_app
+    /db
+    /app
+        __init__.py             # Initializes your Flask app and includes configurations
+        /static
+            /js
+                script.js       # Your JavaScript file for frontend logic
+        /templates
+            index.html          # Main HTML file
+            about.html          # Additional HTML file for 'About' page
+            otherpage.html      # Any other HTML file
+        /models
+            __init__.py
+            models.py           # Defines your SQLAlchemy data models
+        /routes
+            __init__.py
+            view_routes.py      # Flask routes for your views
+        /services
+            __init__.py
+            business_logic.py   # Python file containing business logic
+    /migrations                 # Directory for Alembic migration scripts (if using Flask-Migrate)
+    config.py                   # Contains configuration settings for your Flask app
+    run.py                       # Entry point to start the Flask application
+requirements.txt               # Lists all Python dependencies for the project

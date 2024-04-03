@@ -1,0 +1,64 @@
+Table Players {
+  PlayerID integer [pk]
+  name text
+  sex text
+  birthdate text
+  }
+
+
+Table Championships {
+  ChampionshipID integer [pk]
+  name text
+  }
+
+Table ChampionshipPlayers {
+  PlayerID integer 
+  ChampionshipID integer 
+  }
+
+Table Teams {
+  TeamID integer [pk]
+  ChampionshipID integer 
+  team_name text
+  }
+
+Table TeamMembers {
+  TeamID integer
+  PlayerID integer 
+}
+
+Table Series {
+  SeriesID integer [pk]
+  ChampionshipID integer 
+  series_name text
+  }
+
+Table Tische {
+  TischID integer [pk]
+  SeriesID integer 
+  table_name text
+  }
+
+Table PlayerTables {
+  PlayerID integer 
+  TableID integer 
+  Points integer
+  WonGames integer
+  LostGames integer
+  }
+
+// Relationships
+Ref: ChampionshipPlayers.ChampionshipID > Championships.ChampionshipID
+Ref: ChampionshipPlayers.PlayerID > Players.PlayerID
+
+Ref: TeamMembers.TeamID > Teams.TeamID
+Ref: TeamMembers.PlayerID > Players.PlayerID
+
+Ref: Teams.ChampionshipID > Championships.ChampionshipID
+
+Ref: Series.ChampionshipID > Championships.ChampionshipID
+
+Ref: Tische.SeriesID > Series.SeriesID
+
+Ref: PlayerTables.PlayerID > Players.PlayerID
+Ref: PlayerTables.TableID > Tische.TischID
