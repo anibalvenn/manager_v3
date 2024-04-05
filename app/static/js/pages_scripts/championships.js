@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function () {
   console.log("loaded")
 
@@ -58,4 +59,56 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Closing Remove modal');
     hideRemoveModal();
   });
+
+  const btnAddNewChampionship = document.getElementById('btnAddNewChampionship')
+  btnAddNewChampionship.addEventListener('click', function () {
+    // Get input field values
+    const championshipName = document.getElementById('inputChampionshipName').value;
+    const championshipStart = document.getElementById('inputChampionshipStart').value;
+    const championshipAcronym = document.getElementById('inputChampionshipAcronym').value;
+
+    // Check if all fields are filled
+    if (championshipName.trim() && championshipStart.trim()&& championshipAcronym.trim()) {
+      // Parse and format birthdate
+      const championshipBirth = formatDate(new Date(championshipStart));
+
+      // Send an HTTP POST request to the backend
+      fetch('/add_championship', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          championshipName: championshipName,
+          championshipStart: championshipStart,
+          championshipAcronym: championshipAcronym
+        })
+      })
+        .then(response => {
+          if (response.ok) {
+            alert('championship added successfully');
+            // Clear input fields
+            document.getElementById('inputChampionshipName').value = '';
+            document.getElementById('inputChampionshipStart').value = '';
+            document.getElementById('inputChampionshipAcronym').value = '';
+          } else {
+            throw new Error('Failed to add championship');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Failed to add championship');
+        });
+    } else {
+      // If any field is empty, alert the user
+      alert('Please fill in all fields.');
+    }
+  });
 });
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}

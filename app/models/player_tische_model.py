@@ -1,7 +1,7 @@
 from app import db
 
-class Player_Tables_Model(db.Model):
-    __tablename__ = 'player_tables'
+class Player_Tische_Model(db.Model):
+    __tablename__ = 'player_tische'
     PlayerID = db.Column(db.Integer, db.ForeignKey('players.PlayerID'), primary_key=True)
     TischID = db.Column(db.Integer, db.ForeignKey('tische.TischID'), primary_key=True)
     TischPoints = db.Column(db.Integer, nullable=False)
@@ -44,3 +44,23 @@ class Player_Tables_Model(db.Model):
             db.session.commit()
             return True
         return False
+
+    @classmethod
+    def select_player_table_records(cls, player_id=None, tisch_id=None, min_tisch_points=None, min_total_points=None, min_won_games=None, min_lost_games=None):
+        """Selects player table records based on given parameters."""
+        query = cls.query
+
+        if player_id:
+            query = query.filter_by(PlayerID=player_id)
+        if tisch_id:
+            query = query.filter_by(TischID=tisch_id)
+        if min_tisch_points is not None:
+            query = query.filter(cls.TischPoints >= min_tisch_points)
+        if min_total_points is not None:
+            query = query.filter(cls.TotalPoints >= min_total_points)
+        if min_won_games is not None:
+            query = query.filter(cls.WonGames >= min_won_games)
+        if min_lost_games is not None:
+            query = query.filter(cls.LostGames >= min_lost_games)
+
+        return query.all()

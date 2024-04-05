@@ -6,19 +6,19 @@ class Player_Model(db.Model):
     PlayerID = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     sex = db.Column(db.Text, nullable=False)
-    birthdate = db.Column(db.Date, nullable=False)  # Ensuring the use of db.Date for birthdate
+    birthdate = db.Column(db.Date, nullable=False)
+    country = db.Column(db.Text, nullable=False)  # Adding country field
 
     @classmethod
-    def insert_player(cls, name, sex, birthdate):
+    def insert_player(cls, name, sex, birthdate, country):
         """Inserts a new player into the database."""
-        # Assuming birthdate is passed as a datetime.date object or similar format that db.Date can handle
-        new_player = cls(name=name, sex=sex, birthdate=birthdate)
+        new_player = cls(name=name, sex=sex, birthdate=birthdate, country=country)
         db.session.add(new_player)
         db.session.commit()
         return new_player
 
     @classmethod
-    def update_player(cls, player_id, name=None, sex=None, birthdate=None):
+    def update_player(cls, player_id, name=None, sex=None, birthdate=None, country=None):
         """Updates an existing player's information."""
         player = cls.query.get(player_id)
         if player:
@@ -27,8 +27,9 @@ class Player_Model(db.Model):
             if sex is not None:
                 player.sex = sex
             if birthdate is not None:
-                # Ensure that birthdate is in the correct format
                 player.birthdate = birthdate
+            if country is not None:
+                player.country = country
             db.session.commit()
             return player
         return None
@@ -44,7 +45,7 @@ class Player_Model(db.Model):
         return False
 
     @classmethod
-    def select_player(cls, player_id=None, name=None, sex=None, birthdate=None):
+    def select_player(cls, player_id=None, name=None, sex=None, birthdate=None, country=None):
         """Selects players based on given parameters."""
         query = cls.query
 
@@ -59,6 +60,8 @@ class Player_Model(db.Model):
             conditions.append(cls.sex == sex)
         if birthdate:
             conditions.append(cls.birthdate == birthdate)
+        if country:
+            conditions.append(cls.country == country)
 
         if conditions:
             return query.filter(*conditions).all()

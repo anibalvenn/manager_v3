@@ -25,32 +25,32 @@
 
     <div id="divAddNewPlayer" class="flex items-center justify-center space-x-4 mb-4 bg-gray-800 p-2">
       <form id="formAddNewPlayer" action="" class="flex items-center space-x-2 bg-gray-900 px-5 rounded-md">
-        <div id="divInputPlayerName" class="flex flex-col items-center space-y-2 ">
-          <label for="inputPlayerName" class="text-white">Name:</label>
-          <input id="inputPlayerName" type="text" placeholder="Player Name"
-            class="border border-gray-300 bg-gray-600 text-white w-80 px-2 py-1 rounded-md">
+        <div id="divInputPlayerName" class="flex flex-col items-center space-y-2">
+            <label for="inputPlayerName" class="text-white">Name:</label>
+            <input id="inputPlayerName" type="text" placeholder="Player Name"
+                class="border border-gray-300 bg-gray-600 text-white w-80 px-2 py-1 rounded-md" required>
         </div>
         <div id="divInputPlayerBirth" class="flex flex-col items-center space-y-2">
-          <label for="inputPlayerBirth"  class="text-white">Birth:</label>
-          <input id="inputPlayerBirth" type="date" placeholder="Player Birth"
-            class="border border-gray-300 bg-gray-600 text-white px-2 py-1 rounded-md">
+            <label for="inputPlayerBirth" class="text-white">Birth:</label>
+            <input id="inputPlayerBirth" type="date" placeholder="Player Birth"
+                class="border border-gray-300 bg-gray-600 text-white px-2 py-1 rounded-md" required>
         </div>
         <div id="divInputPlayerSex" class="flex flex-col items-center space-y-4">
-          <label  class="text-white" >Sex:</label>
-          <div class="flex items-center space-x-1 ">
-              <input id="male" type="radio" name="sex" value="male">
-              <label for="male"  class="text-white">M</label>
-              <input id="female" type="radio" name="sex" value="female">
-              <label for="female"  class="text-white">F</label>
-          </div>
-      </div>
-       
-        <div id="divInputPlayerCountry" class="flex flex-col items-center space-y-2">
-          <label for="inputPlayerCountry"  class="text-white">Country:</label>
-          <input id="inputPlayerCountry" type="text" placeholder="Player Country"
-            class="border border-gray-300 px-2 py-1 rounded-md bg-gray-600 text-white">
+            <label class="text-white">Sex:</label>
+            <div class="flex items-center space-x-1 ">
+                <input id="male" type="radio" name="sex" value="male" required>
+                <label for="male" class="text-white">M</label>
+                <input id="female" type="radio" name="sex" value="female" required>
+                <label for="female" class="text-white">F</label>
+            </div>
         </div>
-      </form>
+        <div id="divInputPlayerCountry" class="flex flex-col items-center space-y-2">
+            <label for="inputPlayerCountry" class="text-white">Country:</label>
+            <input id="inputPlayerCountry" type="text" placeholder="Player Country"
+                class="border border-gray-300 px-2 py-1 rounded-md bg-gray-600 text-white" required>
+        </div>
+    </form>
+    
       <button id="btnAddNewPlayer" class="px-4 py-2 bg-blue-500 text-white rounded-md">Add New Player</button>
 
     </div>
