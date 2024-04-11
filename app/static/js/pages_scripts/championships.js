@@ -1,32 +1,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-  console.log("loaded")
 
-  // Function to toggle the visibility of modalEditChampionship
-  function showEditModal() {
-    const modalEditChampionship = document.getElementById('modalEditChampionship');
-    console.log('Toggling Edit Modal');
-    modalEditChampionship.classList.remove('hidden');
-  }
-  // Function to toggle the visibility of modalEditChampionship
-  function hideEditModal() {
-    const modalEditChampionship = document.getElementById('modalEditChampionship');
-    console.log('Toggling Edit Modal');
-    modalEditChampionship.classList.add('hidden');
-  }
 
-  // Function to toggle the visibility of modalRemoveChampionship
-  function showRemoveModal() {
-    const modalRemoveChampionship = document.getElementById('modalRemoveChampionship');
-    console.log('Toggling Remove Modal');
-    modalRemoveChampionship.classList.remove('hidden');
-  }
-  // Function to toggle the visibility of modalRemoveChampionship
-  function hideRemoveModal() {
-    const modalRemoveChampionship = document.getElementById('modalRemoveChampionship');
-    console.log('Toggling Remove Modal');
-    modalRemoveChampionship.classList.add('hidden');
-  }
 
   // Event listener for the "Edit" button
   const editButtons = document.querySelectorAll('.edit-button');
@@ -68,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const championshipAcronym = document.getElementById('inputChampionshipAcronym').value;
 
     // Check if all fields are filled
-    if (championshipName.trim() && championshipStart.trim()&& championshipAcronym.trim()) {
+    if (championshipName.trim() && championshipStart.trim() && championshipAcronym.trim()) {
       // Parse and format birthdate
       const championshipBirth = formatDate(new Date(championshipStart));
 
@@ -106,9 +81,210 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const btnRemoveChampionship = document.getElementById('btnRemoveChampionship');
+
+  const championshipTableBody = document.getElementById('championshipTableBody');
+
+  // Function to generate table rows for championship data
+  function createChampionshipRow(championship) {
+    console.log(championship)
+    const row = document.createElement('tr');
+    row.id = championship.championshipID; // Set the id of the row to championship acronym
+
+    // Create and append table cells for each championship property
+    const nameCell = document.createElement('td');
+    nameCell.textContent = championship.name;
+    row.appendChild(nameCell);
+
+    const startDateCell = document.createElement('td');
+    startDateCell.textContent = championship.start_date;
+    row.appendChild(startDateCell);
+
+    const acronymCell = document.createElement('td');
+    acronymCell.textContent = championship.acronym;
+    row.appendChild(acronymCell);
+
+    const editCell = document.createElement('td');
+    const editButton = document.createElement('button');
+    editButton.textContent = 'Edit';
+    editButton.className = 'bg-yellow-600 text-white hover:bg-yellow-900 px-3 py-1 rounded-md edit-button';
+    editButton.addEventListener('click', () => {
+      // Get the championship data from the row
+      const championshipName = row.cells[0].textContent.trim();
+      const championshipStart = row.cells[1].textContent.trim();
+      const championshipAcronym = row.cells[2].textContent.trim();
+
+      // Fill the form fields with the championship data
+      document.getElementById('editChampionshipName').value = championshipName;
+      document.getElementById('editChampionshipStart').value = championshipStart;
+      document.getElementById('editChampionshipAcronym').value = championshipAcronym;
+
+      const modalEditChampionship = document.getElementById('modalEditChampionship');
+
+      modalEditChampionship.setAttribute('data-championship-id', championship.championshipID);
+
+      showEditModal()
+
+    })
+    editCell.appendChild(editButton);
+    row.appendChild(editCell);
+
+    const removeCell = document.createElement('td');
+    const removeButton = document.createElement('button');
+
+    removeButton.textContent = 'Delete';
+    removeButton.className = 'bg-red-600 text-white hover:bg-red-900 px-3 py-1 rounded-md remove-button';
+    removeButton.addEventListener('click', () => {
+      const spanRemoveChampionship = document.getElementById('spanRemoveChampionship');
+      spanRemoveChampionship.textContent = championship.name;
+
+      const modalRemoveChampionship = document.getElementById('modalRemoveChampionship');
+      modalRemoveChampionship.setAttribute('data-championship-id', championship.championshipID);
+
+      // Add event listener to the "Delete" button
+      btnRemoveChampionship.addEventListener('click', handleDeleteChampionship);
+
+      showRemoveModal();
+    });
+
+    removeCell.appendChild(removeButton);
+    row.appendChild(removeCell);
+
+    return row;
+  }
+
+  // Function to render championship data in the table
+  function renderChampionships(championships) {
+    // Clear existing table rows
+    championshipTableBody.innerHTML = '';
+
+    // Generate table rows for each championship and append to table body
+    championships.forEach(championship => {
+      const row = createChampionshipRow(championship);
+      championshipTableBody.appendChild(row);
+    });
+  }
+
+  // Fetch championship data from the server
+  fetch('/get_championships')
+    .then(response => response.json())
+    .then(data => {
+      renderChampionships(data); // Render fetched data in the table
+    })
+    .catch(error => {
+      console.error('Error fetching championship data:', error);
+    });
+
+
+    const formEditChampionship = document.getElementById('formEditChampionship');
+
+    formEditChampionship.addEventListener('submit', function (event) {
+      event.preventDefault();
+  
+      // Get the championship ID from the modal attribute
+      const championshipId = document.getElementById('modalEditChampionship').getAttribute('data-championship-id');
+  
+      // Get the values from the form fields
+      const championshipName = document.getElementById('editChampionshipName').value;
+      const championshipStart = document.getElementById('editChampionshipStart').value;
+      const championshipAcronym = document.getElementById('editChampionshipAcronym').value;
+  
+      // Send an HTTP POST request to the backend to update the championship
+      fetch(`/update_championship/${championshipId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: championshipName,
+          acronym: championshipAcronym,
+          creation_date: championshipStart // Assuming the creation date is also being updated
+        })
+      })
+        .then(response => {
+          if (response.ok) {
+            alert('Championship updated successfully');
+            // Close the modal after successful update
+            hideEditModal();
+          } else {
+            throw new Error('Failed to update championship');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Failed to update championship');
+        });
+    });
+
+});
+
+
 function formatDate(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+// Function to toggle the visibility of modalEditChampionship
+function showEditModal() {
+  const modalEditChampionship = document.getElementById('modalEditChampionship');
+  modalEditChampionship.classList.remove('hidden');
+}
+// Function to toggle the visibility of modalEditChampionship
+function hideEditModal() {
+  const modalEditChampionship = document.getElementById('modalEditChampionship');
+  modalEditChampionship.classList.add('hidden');
+}
+
+// Function to toggle the visibility of modalRemoveChampionship
+function showRemoveModal() {
+  const modalRemoveChampionship = document.getElementById('modalRemoveChampionship');
+  modalRemoveChampionship.classList.remove('hidden');
+}
+// Function to toggle the visibility of modalRemoveChampionship
+function hideRemoveModal() {
+  const modalRemoveChampionship = document.getElementById('modalRemoveChampionship');
+  modalRemoveChampionship.classList.add('hidden');
+}
+
+function deleteChampionship(rowID) {
+  const championshipId = rowID; // Get the championship ID from the row id
+  // Send an HTTP DELETE request to the backend to delete the championship
+  fetch(`/delete_championship/${championshipId}`, {
+    method: 'DELETE'
+  })
+    .then(response => {
+      if (response.ok) {
+        alert('Championship removed successfully');
+        // Find the row with the matching ID and remove it
+        const rowToRemove = document.getElementById(championshipId);
+        if (rowToRemove) {
+          rowToRemove.remove();
+        } else {
+          throw new Error('Row not found');
+        }
+      } else {
+        throw new Error('Failed to remove championship');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to remove championship');
+    });
+}
+
+function handleDeleteChampionship() {
+  const btnRemoveChampionship = document.getElementById('btnRemoveChampionship');
+
+  const modalRemoveChampionship = document.getElementById('modalRemoveChampionship');
+  const championshipId = modalRemoveChampionship.getAttribute('data-championship-id');
+  deleteChampionship(championshipId);
+  hideRemoveModal();
+
+  // Remove event listener from the "Delete" button
+  btnRemoveChampionship.removeEventListener('click', handleDeleteChampionship);
+}
+

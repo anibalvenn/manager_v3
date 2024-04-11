@@ -27,6 +27,40 @@ def add_championship():
     return jsonify({'message': 'championship added successfully'}), 201
 
 # Add more routes for championship management as needed
+@championship_bp.route('/get_championships', methods=['GET'])
+def get_championships():
+    championships = Championship_Model.select_championship()
+    championship_data = [{'championshipID': champ.ChampionshipID, 'name': champ.name, 'start_date': champ.creation_date.strftime('%Y-%m-%d'), 'acronym': champ.acronym} for champ in championships]
+    return jsonify(championship_data)
+
+
+@championship_bp.route('/delete_championship/<int:championship_id>', methods=['DELETE'])
+def delete_championship(championship_id):
+    print(championship_id)
+    # Attempt to delete the championship with the provided ID from the database
+    if Championship_Model.delete_championship(championship_id):
+        return jsonify({'message': 'Championship removed successfully'}), 200
+    else:
+        return jsonify({'message': 'Failed to remove championship'}), 404
+
+@championship_bp.route('/update_championship/<int:championship_id>', methods=['POST'])
+def update_championship(championship_id):
+    data = request.json
+
+    # Extract data from the request
+    championship_name = data.get('name')
+    championship_acronym = data.get('acronym')
+    championship_creation_date_string = data.get('creation_date')
+    championship_creation_date = datetime.strptime(championship_creation_date_string, "%Y-%m-%d")
+
+
+    # Update the championship in the database
+    updated_championship = Championship_Model.update_championship(championship_id, name=championship_name, acronym=championship_acronym, creation_date=championship_creation_date)
+
+    if updated_championship:
+        return jsonify({'message': 'Championship updated successfully'}), 200
+    else:
+        return jsonify({'error': 'Failed to update championship'}), 400
 
 def init_routes(app):
     app.register_blueprint(championship_bp)
