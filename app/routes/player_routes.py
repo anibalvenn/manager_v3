@@ -28,6 +28,44 @@ def add_player():
     return jsonify({'message': 'Player added successfully'}), 201
 
 # Add more routes for player management as needed
+@player_bp.route('/select_player', methods=['GET'])
+def select_player():
+    player_id = request.args.get('player_id')
+    name = request.args.get('name')
+    sex = request.args.get('sex')
+    birthdate = request.args.get('birthdate')
+    country = request.args.get('country')
+    
+    players = Player_Model.select_player(player_id=player_id, name=name, sex=sex, birthdate=birthdate, country=country)
+    player_data = [{'PlayerID': player.PlayerID, 'name': player.name, 'sex': player.sex, 'birthdate': player.birthdate.strftime('%Y-%m-%d'), 'country': player.country} for player in players]
+    
+    return jsonify(player_data)
+
+@player_bp.route('/update_player/<int:player_id>', methods=['PUT'])
+def update_player(player_id):
+    data = request.json
+    
+    name = data.get('playerName')
+    sex = data.get('playerSex')
+    birthdate_str = data.get('playerBirth')
+    birthdate = datetime.strptime(birthdate_str, '%Y-%m-%d').date()
+    country = data.get('playerCountry')
+    
+    updated_player = Player_Model.update_player(player_id, name=name, sex=sex, birthdate=birthdate, country=country)
+    
+    if updated_player:
+        return jsonify({'message': 'Player updated successfully'}), 200
+    else:
+        return jsonify({'error': 'Player not found'}), 404
+
+@player_bp.route('/delete_player/<int:player_id>', methods=['DELETE'])
+def delete_player(player_id):
+    deleted = Player_Model.delete_player(player_id)
+    
+    if deleted:
+        return jsonify({'message': 'Player deleted successfully'}), 200
+    else:
+        return jsonify({'error': 'Player not found'}), 404
 
 def init_routes(app):
     app.register_blueprint(player_bp)
