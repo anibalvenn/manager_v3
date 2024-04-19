@@ -7,6 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manager</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   <script src="{{ url_for('static', filename='js/pages_scripts/championships.js') }}"></script>
@@ -85,37 +87,42 @@
   </div>
 
 
-<!-- Modal for editing championship -->
-<div id="modalEditChampionship" class="fixed z-10 inset-0 overflow-y-auto hidden">
-  <div class="flex items-center justify-center min-h-screen">
-    <div class="bg-white rounded-lg shadow-xl p-6 bg-blue-100 relative">
-      <!-- Close button -->
-      <button id="closeModalEditChampionship" class="absolute top-0 right-0 p-2 text-white bg-red-500 hover:bg-red-600 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+  <!-- Modal for editing championship -->
+  <div id="modalEditChampionship" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen">
+      <div class="bg-white rounded-lg shadow-xl p-6 bg-blue-100 relative">
+        <!-- Close button -->
+        <button id="closeModalEditChampionship"
+          class="absolute top-0 right-0 p-2 text-white bg-red-500 hover:bg-red-600 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
-      <!-- Edit championship form -->
-      <form id="formEditChampionship" action="" class="flex flex-col space-y-4">
-        <!-- Championship Name -->
-        <label for="editChampionshipName">Championship Name:</label>
-        <input id="editChampionshipName" type="text" placeholder="Championship Name" class="border border-gray-300 px-4 py-2 rounded-md">
+        <!-- Edit championship form -->
+        <form id="formEditChampionship" action="" class="flex flex-col space-y-4">
+          <!-- Championship Name -->
+          <label for="editChampionshipName">Championship Name:</label>
+          <input id="editChampionshipName" type="text" placeholder="Championship Name"
+            class="border border-gray-300 px-4 py-2 rounded-md">
 
-        <!-- Start Date -->
-        <label for="editChampionshipStart">Start Date:</label>
-        <input id="editChampionshipStart" type="text" placeholder="Championship Start Date" class="border border-gray-300 px-4 py-2 rounded-md">
+          <!-- Start Date -->
+          <label for="editChampionshipStart">Start Date:</label>
+          <input id="editChampionshipStart" type="text" placeholder="Championship Start Date"
+            class="border border-gray-300 px-4 py-2 rounded-md">
 
-        <!-- Acronym -->
-        <label for="editChampionshipAcronym">Championship Acronym:</label>
-        <input id="editChampionshipAcronym" type="text" placeholder="Championship Acronym" class="border border-gray-300 px-4 py-2 rounded-md">
+          <!-- Acronym -->
+          <label for="editChampionshipAcronym">Championship Acronym:</label>
+          <input id="editChampionshipAcronym" type="text" placeholder="Championship Acronym"
+            class="border border-gray-300 px-4 py-2 rounded-md">
 
-        <!-- Save Changes Button -->
-        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md">Save Changes</button>
-      </form>
+          <!-- Save Changes Button -->
+          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md">Save
+            Changes</button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
 
 
@@ -140,6 +147,9 @@
       </div>
     </div>
   </div>
+
+
+
 </body>
 
 </html>

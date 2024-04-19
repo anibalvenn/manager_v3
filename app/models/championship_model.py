@@ -61,3 +61,12 @@ class Championship_Model(db.Model):
                 return championships
 
         return query.all()  # Returns all championships if no specific filter is provided
+
+    @classmethod
+    def get_championship_name(cls,championship_id):
+        championship = Championship_Model.query.filter_by(ChampionshipID=championship_id).first()
+        if championship:
+            return championship.name
+        else:
+            return None
+

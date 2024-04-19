@@ -1,8 +1,6 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-
-
   // Event listener for the "Edit" button
   const editButtons = document.querySelectorAll('.edit-button');
   editButtons.forEach(button => {
@@ -34,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Closing Remove modal');
     hideRemoveModal();
   });
+
 
   const btnAddNewChampionship = document.getElementById('btnAddNewChampionship')
   btnAddNewChampionship.addEventListener('click', function () {
@@ -88,9 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const championshipTableBody = document.getElementById('championshipTableBody');
 
-  // Function to generate table rows for championship data
   function createChampionshipRow(championship) {
-    console.log(championship)
     const row = document.createElement('tr');
     row.id = championship.championshipID; // Set the id of the row to championship acronym
 
@@ -107,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
     acronymCell.textContent = championship.acronym;
     row.appendChild(acronymCell);
 
+    // Create and append edit button
     const editCell = document.createElement('td');
     const editButton = document.createElement('button');
     editButton.textContent = 'Edit';
@@ -123,18 +121,17 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('editChampionshipAcronym').value = championshipAcronym;
 
       const modalEditChampionship = document.getElementById('modalEditChampionship');
-
       modalEditChampionship.setAttribute('data-championship-id', championship.championshipID);
 
-      showEditModal()
 
-    })
+      showEditModal();
+    });
     editCell.appendChild(editButton);
     row.appendChild(editCell);
 
+    // Create and append remove button
     const removeCell = document.createElement('td');
     const removeButton = document.createElement('button');
-
     removeButton.textContent = 'Delete';
     removeButton.className = 'bg-red-600 text-white hover:bg-red-900 px-3 py-1 rounded-md remove-button';
     removeButton.addEventListener('click', () => {
@@ -149,12 +146,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
       showRemoveModal();
     });
-
     removeCell.appendChild(removeButton);
     row.appendChild(removeCell);
 
+    // Create and append players cell
+    const playersCell = document.createElement('td');
+    const playersButton = document.createElement('button');
+    playersButton.textContent = 'Players';
+    playersButton.className = 'bg-green-500 text-white hover:bg-green-600 px-3 py-1 rounded-md players-button';
+    playersButton.addEventListener('click', () => {
+     console.log(championship.championshipID)
+      window.location.href = `/championship_players/${championship.championshipID}`;
+
+    });
+    playersCell.appendChild(playersButton);
+    row.appendChild(playersCell);
+
     return row;
   }
+
 
   // Function to render championship data in the table
   function renderChampionships(championships) {
@@ -179,45 +189,45 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    const formEditChampionship = document.getElementById('formEditChampionship');
+  const formEditChampionship = document.getElementById('formEditChampionship');
 
-    formEditChampionship.addEventListener('submit', function (event) {
-      event.preventDefault();
-  
-      // Get the championship ID from the modal attribute
-      const championshipId = document.getElementById('modalEditChampionship').getAttribute('data-championship-id');
-  
-      // Get the values from the form fields
-      const championshipName = document.getElementById('editChampionshipName').value;
-      const championshipStart = document.getElementById('editChampionshipStart').value;
-      const championshipAcronym = document.getElementById('editChampionshipAcronym').value;
-  
-      // Send an HTTP POST request to the backend to update the championship
-      fetch(`/update_championship/${championshipId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: championshipName,
-          acronym: championshipAcronym,
-          creation_date: championshipStart // Assuming the creation date is also being updated
-        })
+  formEditChampionship.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // Get the championship ID from the modal attribute
+    const championshipId = document.getElementById('modalEditChampionship').getAttribute('data-championship-id');
+
+    // Get the values from the form fields
+    const championshipName = document.getElementById('editChampionshipName').value;
+    const championshipStart = document.getElementById('editChampionshipStart').value;
+    const championshipAcronym = document.getElementById('editChampionshipAcronym').value;
+
+    // Send an HTTP POST request to the backend to update the championship
+    fetch(`/update_championship/${championshipId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: championshipName,
+        acronym: championshipAcronym,
+        creation_date: championshipStart // Assuming the creation date is also being updated
       })
-        .then(response => {
-          if (response.ok) {
-            alert('Championship updated successfully');
-            // Close the modal after successful update
-            hideEditModal();
-          } else {
-            throw new Error('Failed to update championship');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Failed to update championship');
-        });
-    });
+    })
+      .then(response => {
+        if (response.ok) {
+          alert('Championship updated successfully');
+          // Close the modal after successful update
+          hideEditModal();
+        } else {
+          throw new Error('Failed to update championship');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update championship');
+      });
+  });
 
 });
 
@@ -248,6 +258,16 @@ function showRemoveModal() {
 function hideRemoveModal() {
   const modalRemoveChampionship = document.getElementById('modalRemoveChampionship');
   modalRemoveChampionship.classList.add('hidden');
+}
+// Function to toggle the visibility of modalRemoveChampionship
+function showEditPlayersModal() {
+  const modalEditPlayersChampionship = document.getElementById('modalEditPlayersChampionship');
+  modalEditPlayersChampionship.classList.remove('hidden');
+}
+// Function to toggle the visibility of modalEditPlayersChampionship
+function hideEditPlayersModal() {
+  const modalEditPlayersChampionship = document.getElementById('modalEditPlayersChampionship');
+  modalEditPlayersChampionship.classList.add('hidden');
 }
 
 function deleteChampionship(rowID) {
@@ -288,3 +308,6 @@ function handleDeleteChampionship() {
   btnRemoveChampionship.removeEventListener('click', handleDeleteChampionship);
 }
 
+function renderEditPlayers() {
+
+}
