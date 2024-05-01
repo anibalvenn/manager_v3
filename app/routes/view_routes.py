@@ -35,5 +35,9 @@ def init_routes(app):
     def show_championship_players(championship_id):
         championship_name = championship_players_service.get_championship_name(championship_id)
         registered_players, unregistered_players = championship_players_service.get_players_for_championship(championship_id)
+        
+                # Iterate over registered_players and print PlayerID for each player
+        # for player in registered_players:
+        #     print(player.PlayerID)
         return render_template('championship_players.html', championship_name=championship_name, registered_players=registered_players, 
                                unregistered_players=unregistered_players, championship_id=championship_id)

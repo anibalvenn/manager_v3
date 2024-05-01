@@ -56,3 +56,15 @@ class Championship_Player_Model(db.Model):
             return query.filter_by(ChampionshipID=championship_id).all()
         else:
             return query.all()
+        
+    @classmethod
+    def select_championship_players_by_championship_id(cls, championship_id=None):
+        query = cls.query
+     
+        if championship_id:
+            # Select players for the given championship and sort them by group and position within group
+            return query.filter_by(ChampionshipID=championship_id).order_by(cls.player_group, cls.player_position_in_group).all()
+        else:
+            # Select all players and sort them by group and position within group
+            return query.order_by(cls.player_group, cls.player_position_in_group).all()
+

@@ -33,3 +33,25 @@
   background: rgba(255, 255, 255, 0.5); /* This creates the opacity effect */
   z-index: -1;
 }
+
+tr.dragging {
+  background-color: #f3f4f6;
+}
+
+
+/* Add CSS styles for each group */
+.group-1 {
+  background-color: #f0f0f0; /* Light gray */
+}
+
+.group-2 {
+  background-color: #e0e0e0; /* Lighter gray */
+}
+
+.group-3 {
+  background-color: #d0d0d0; /* Even lighter gray */
+}
+
+.group-4 {
+  background-color: #c0c0c0; /* Very light gray */
+}
