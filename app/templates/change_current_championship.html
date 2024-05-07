@@ -1,0 +1,37 @@
+<!-- change_current_championship.html -->
+<div class="max-w-7xl mx-auto bg-gray-300">
+  <!-- Centered title -->
+  <div id="showCurrentChampionship" class="flex items-center justify-center space-x-4 mb-4 bg-gray-500 p-2">
+    <h1 class="font-bold">Managing <span id="spanCurrentChampionshipName"></span> Placeholder 2024</h1>
+    <button id="btnChangeCurrentChampionship" class="px-4 py-2 bg-yellow-500 rounded-md">Change</button>
+
+  </div>
+</div>
+
+<div id="chooseCurrentChampionship" class="flex flex-col items-center mx-40 hidden bg-gray-200 p-1 mt-0 rounded ">
+  <h1 class="font-bold text-center border-b border-gray-200">Choose current championship </h1>
+  <input type="text" id="searchCurrentChampionship" placeholder="Search championships..."
+    class="pl-10 pr-3 w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 mt-2">
+
+  <table id="tableSelectChampionships" class="mt-2 w-full border-b border-gray-200 text-sm bg-gray-100">
+    <div class="h-12 overflow-x-auto">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="text-left w-32">Name</th>
+          <th class="text-left w-12">Acronym</th>
+          <th class="text-left w-12">ID</th>
+          <th class="text-left w-12">Select</th>
+        </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </div>
+  </table>
+  <div class="flex justify-center space-x-4 py-1">
+    <button id="btnCloseCurrentChampionships"
+      class="bg-red-500 hover:bg-red-600 px-4 text-white rounded-md">Cancel</button>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pages_scripts/current_championship.js') }}"></script>
