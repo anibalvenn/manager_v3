@@ -9,6 +9,8 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages_scripts/teams.js') }}"></script>
+
 </head>
 
 <body>
@@ -22,13 +24,12 @@
       <table id="teamTable" class="min-w-full divide-y divide-gray-400">
         <thead class="bg-gray-50">
           <tr>
-            <th colspan="6" class="px-6 py-3 flex items-center">
+            <th colspan="6" class="px-6 py-3  w-full">
               <!-- Search input -->
-              <input id="teamSearch" type="text" placeholder="Search team"
-                class="border border-gray-300 px-2 py-1 rounded-md w-full mr-2">
+              <button id="btnCreateNewTeam" class="bg-green-600 text-white mx-6 px-4 py-1 rounded-md w-48">+ Create Team</button>
+              <input id="teamSearch" type="text" placeholder="Search existing team"
+                class="border border-gray-300 px-2 py-1 rounded-md mx-6 w-96">
 
-              <!-- Button -->
-              <button class="bg-blue-500 text-white px-4 py-1  rounded-md">+ New Team</button>
             </th>
           </tr>
           <tr>

@@ -7,9 +7,13 @@ class Player:
         self.birthdate = birthdate
         self.country = country
         self.age = self.calculate_age()  # Corrected indentation and method call
+        self.playerID = None  # Initially set to None
 
     def __repr__(self):
-        return f"Player(name='{self.name}', sex='{self.sex}', birthdate='{self.birthdate}', country='{self.country}')"
+        return f"Player(playerID={self.playerID}, name='{self.name}', sex='{self.sex}', birthdate='{self.birthdate}', country='{self.country}')"
+
+    def set_playerID(self, playerID):
+        self.playerID = playerID
 
     def calculate_age(self):
         today = date.today()

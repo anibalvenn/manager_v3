@@ -6,9 +6,12 @@
             /js
                 script.js       # Your JavaScript file for frontend logic
         /templates
-            index.html          # Main HTML file
-            about.html          # Additional HTML file for 'About' page
-            otherpage.html      # Any other HTML file
+            championships.html          # Main HTML file
+            series.html          # Additional HTML file for 'About' page
+            tische.html      # Any other HTML file
+            players.html      # Any other HTML file
+            teams.html      # Any other HTML file
+            results.html      # Any other HTML file
         /models
             __init__.py
             models.py           # Defines your SQLAlchemy data models

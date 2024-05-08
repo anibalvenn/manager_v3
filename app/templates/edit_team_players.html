@@ -1,30 +1,143 @@
-<!-- navbar.html -->
-<nav class="bg-gray-800">
-  <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <div class="flex">
-        <div class="flex-shrink-0">
-          <a href="/" class="text-white text-lg font-bold">Skat Manager</a>
-        </div>
-        <div class=" sm:block sm:ml-6">
-          <div class="flex space-x-4">
-            <a href="/championships.html" id="championships"
-              class="nav-link text-white hover:bg-gray-700 px-5 py-2 rounded-md text-md font-medium">CHAMPIONSHIPS</a>
-            <a href="/series.html" id="series"
-              class="nav-link text-white hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium">SERIES</a>
-            <a href="/tische.html" id="tische"
-              class="nav-link text-white hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium">TISCHE</a>
-            <a href="/players.html" id="players"
-              class="nav-link text-white hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium">PLAYERS</a>
-            <a href="/teams.html" id="teams"
-              class="nav-link text-white hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium">TEAMS</a>
-            <a href="/results.html" id="results"
-              class="nav-link text-white hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium">RESULTS</a>
-            <div class="relative inline-block text-left">
-            </div>
+<!-- edit_team_players.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teams Editor</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages_scripts/edit_team_players.js') }}"></script>
+
+</head>
+<div id="modalEditTeams" data-champioship-id="{{championship_id}}" data-team-id="{{team_id}}"
+  class="fixed top-0 left-0 z-10 w-full h-full overflow-y-auto">
+  <div class="flex items-center justify-center h-full ">
+    <div class="bg-white rounded-lg shadow-xl px-6 w-full h-full overflow-y-auto bg-gray-100">
+      <div class="flex items-center justify-center flex-row"> <!-- Use flex utilities -->
+
+        <h1 class="font-bold text-center border-b border-gray-200 mx-2">Edit Team 
+          <span id="spanTeamName" data-team-name="{{team_name}}">{{ team_name }}</span></h1>
+        <input type="text" name="inputTeamName" id="inputTeamName" placeholder="Write the team name">
+      </div>
+
+      <div class="flex justify-between space-x-4 px-4">
+        <div id="modalEditPlayersIn" class="flex-1 border-b border-gray-200 ">
+          <h1 id="h1TeamIn" class="text-center border-b border-gray-200">Team Players</h1>
+          <div class="relative mt-2">
+            <input type="text" id="searchTeamPlayer" placeholder="Search players..."
+              class="pl-10 pr-3 w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <span class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></span>
           </div>
+          <div class="h-96 overflow-y-auto">
+            <table id="tableTeamPlayers" class="mt-2 w-full border-b border-gray-200 text-sm "
+              data-championship-id="{{championship_id}}" data-team-id="{{team_id}}">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="px-4 text-left w-1/20">x</th> <!-- New column for checkboxes -->
+                  <th class="px-4 text-left w-1/10 text-2xl font-bold">+</th>
+                  <th class="px-4 text-left w-3/5">Name</th>
+                  <th class="px-4 text-left w-2/20">ID</th>
+                  <th class="px-4 text-left w-1/10 text-2xl font-bold">-</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for player in team_players %}
+                <tr data-player-id="{{ player.PlayerID }}">
+                  <td> <input type="checkbox" class="w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                  </td>
+                  <td class="px-4">
+                    <button class="btnMovePlayerIn text-green-500 hover:text-green-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2" class="w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                      </svg>
+                    </button>
+                  </td>
+                  <td class="px-4 truncate">{{ player.name }}</td>
+                  <td class="px-4 truncate">{{ player.PlayerID }}</td>
+                  <td>
+                    <button class="btnMovePlayerOut text-red-500 hover:text-red-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2" class="w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+
         </div>
+        <div id="modalEditPlayersOut" class="flex-1  border-b border-gray-200">
+          <h1 id="h1TeamOut" class="text-center  border-b border-gray-200">Other Players</h1>
+          <div class="relative mt-2">
+            <input type="text" id="searchOtherPlayers" placeholder="Search players..."
+              class="pl-10 pr-3 w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <span class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></span>
+          </div>
+          <div class="h-96 overflow-y-auto">
+
+            <table id="tableOtherPlayers" class="mt-2 w-full border-b border-gray-200 text-sm"
+              data-championship-id="{{championship_id}}">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="px-4 text-left w-1/20">x</th>
+                  <th class="px-4 text-left w-1/10 text-2xl font-bold">+</th>
+                  <th class="px-4 text-left w-3/5">Name</th>
+                  <th class="px-4 text-left w-2/20">ID</th>
+                  <th class="px-4 text-left w-1/10 text-2xl font-bold">-</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for player in other_players %}
+                <tr data-player-id="{{ player.PlayerID }}">
+                  <td> <input type="checkbox" class="w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                  </td>
+                  <td class="px-4">
+                    <button class="btnMovePlayerIn text-green-500 hover:text-green-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2" class="w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                      </svg>
+                    </button>
+                  </td>
+                  <td class="px-4 truncate">{{ player.name }}</td>
+                  <td class="px-4 truncate">{{ player.PlayerID }}</td>
+                  <td>
+                    <button class="btnMovePlayerOut text-red-500 hover:text-red-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2" class="w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+
+        </div>
+      </div>
+      <div class="flex justify-center space-x-4 mt-4 py-1">
+        <button id="closemodalEditTeams" class="bg-gray-300 hover:bg-gray-400 px-4 py-1 rounded-md">Cancel</button>
+        <button id="btnSaveChangesModalEditTeams"
+          class="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-md">Save Team</button>
       </div>
     </div>
   </div>
-</nav>
+</div>
+
+</body>
+
+</html>

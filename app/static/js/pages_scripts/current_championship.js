@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   document.getElementById('btnCloseCurrentChampionships').addEventListener('click', ()=> {
-    console.log('click')
     const modal = document.getElementById('chooseCurrentChampionship');
     modal.style.display = 'none';
   });

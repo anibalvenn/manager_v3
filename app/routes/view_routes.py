@@ -1,5 +1,5 @@
 from flask import render_template
-from app.services import championship_players_service
+from app.services import championship_players_service, team_players_service
 
 # routes/view_routes.py
 def init_routes(app):
@@ -41,3 +41,12 @@ def init_routes(app):
         #     print(player.PlayerID)
         return render_template('championship_players.html', championship_name=championship_name, registered_players=registered_players, 
                                unregistered_players=unregistered_players, championship_id=championship_id)
+    
+    @app.route('/edit_team_players/<int:championship_id>/<int:team_id>')
+    def show_team_players(championship_id, team_id):
+        team_name = team_players_service.get_team_name(team_id)
+        print(team_name)
+        team_players, other_players = team_players_service.get_team_players_by_championship(championship_id=championship_id,team_id=team_id)
+
+        return render_template('edit_team_players.html', team_name=team_name,team_id=team_id, team_players=team_players,
+                               other_players=other_players, championship_id=championship_id)
