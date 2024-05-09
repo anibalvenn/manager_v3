@@ -178,27 +178,7 @@ function sendDataToServer() {
 
   if (teamId != 0 || teamId != '0') {
 
-    // Update the team name if necessary
-    fetch('/update_team_name', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(dataUpdateTeamName)
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to update team name.');
-        }
-        return response.json(); // Optional: parse the response if further use is needed
-      })
-      .then(() => {
-        console.log('Team name updated successfully.');
-        alert(`Team name updated successfully from ${oldTeamName} to ${teamName}`);
-      })
-      .catch(error => {
-        console.error('Error updating team name:', error.message);
-      });
+    updateTeamName(dataUpdateTeamName, oldTeamName, newTeamName)
   }
 
   // Collect player IDs to add
@@ -223,66 +203,88 @@ function sendDataToServer() {
   if (teamId === '0') {
     // Adding players to a new team
     if (players.length > 0) {
-      fetch('/add_players_to_team', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataAddTeamPlayers)
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to add players to championship.');
-          }
-          console.log('Players added successfully.');
-          alert('Editions recorded successfully');
-        })
-        .catch(error => {
-          console.error('Error adding players:', error.message);
-        });
+      addPlayersToTeam(dataAddTeamPlayers)
     } else {
       console.log('No players to add.');
     }
   } else {
-    // Replace players for an existing team by removing all first
-    fetch('/remove_all_players_from_team', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(dataRemoveTeamPlayers)
+    removeAllPlayersFromTeam(dataRemoveTeamPlayers)
+    .then(() => {
+      // Check if players are available to add before calling the add function
+      if (dataAddTeamPlayers.players.length > 0) {
+        return addPlayersToTeam(dataAddTeamPlayers);
+      } else {
+        // No players to add, resolve immediately
+        return Promise.resolve();
+      }
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to remove players from championship.');
-        }
-        return response.json();
-      })
-      .then(() => {
-        if (players.length > 0) {
-          return fetch('/add_players_to_team', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataAddTeamPlayers)
-          });
-        } else {
-          return Promise.resolve();
-        }
-      })
-      .then(response => {
-        if (response && !response.ok) {
-          throw new Error('Failed to add players to championship.');
-        }
-        console.log('Players added successfully.');
-        alert('Editions recorded successfully');
-      })
-      .catch(error => {
-        console.error('Error updating players:', error.message);
-      });
+    .then(() => {
+      console.log('Players updated successfully.');
+      alert('Editions recorded successfully');
+    })
+    .catch(error => {
+      console.error('Error updating players:', error.message);
+    });
   }
+}
+
+// Function to update team name using the provided data
+function updateTeamName(dataUpdateTeamName, oldTeamName, newTeamName) {
+  fetch('/update_team_name', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataUpdateTeamName)
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to update team name.');
+      }
+      return response.json(); // Optional: parse the response if needed
+    })
+    .then(() => {
+      console.log('Team name updated successfully.');
+      alert(`Team name updated successfully from ${oldTeamName} to ${newTeamName}`);
+    })
+    .catch(error => {
+      console.error('Error updating team name:', error.message);
+    });
 }
 
 
 
+// Function to remove all players from a team
+function removeAllPlayersFromTeam(dataRemoveTeamPlayers) {
+  return fetch('/remove_all_players_from_team', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataRemoveTeamPlayers)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to remove players from the team.');
+    }
+    return response.json(); // You can use the response if needed
+  });
+}
+
+// Function to add players to a team
+function addPlayersToTeam(dataAddTeamPlayers) {
+  return fetch('/add_players_to_team', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataAddTeamPlayers)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to add players to the team.');
+    }
+    alert("Team insertion succesful");
+    return response.json(); // Optional: parse response data if required
+  });
+}

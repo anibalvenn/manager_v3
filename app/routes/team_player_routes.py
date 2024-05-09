@@ -102,5 +102,13 @@ def update_team_name():
         print('Error updating team:', str(e))
         return jsonify({'error': 'Internal server error', 'details': str(e)}), 500
     
+# Add more routes for championship management as needed
+@team_player_bp.route('/get_teams/<int:championship_id>', methods=['GET'])
+def get_teams(championship_id):
+    teams = Teams_Model.select_team(championship_id=championship_id)
+    print('teams',teams)
+    teams_data = [{'teamID': team.TeamID, 'teamName': team.team_name} for team in teams]
+    return jsonify(teams_data)
+
 def init_routes(app):
     app.register_blueprint(team_player_bp)
