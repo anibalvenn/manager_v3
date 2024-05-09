@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const btnSendDataToServer = document.getElementById("btnSaveChangesModalEditTeams")
   btnSendDataToServer.addEventListener('click', () => {
-      sendDataToServer()
+    sendDataToServer()
   })
 
   // Get the input element
@@ -140,63 +140,78 @@ function addEventListenersToMoveButtons() {
 }
 
 function sendDataToServer() {
+  // Get IDs from data attributes
+  const table = document.querySelector('#tableTeamPlayers');
+  const championshipId = table.getAttribute('data-championship-id');
+  const teamId = table.getAttribute('data-team-id');
 
-  const inputTeamName = document.getElementById('inputTeamName');
-  const teamName = inputTeamName.value;
-  if (!teamName || teamName == '') {
-    alert("Please type in a team name")
-    console.log("Please type in a team name")
-    return
-  }else{
-    console.log(teamName)
-  }
-
-
-  // Get the championship ID from the data attribute
-  const championshipId = document.querySelector('#tableTeamPlayers').getAttribute('data-championship-id');
-
-  // Check if championshipId exists
+  // Validate IDs
   if (!championshipId) {
     console.error('Championship ID not found.');
     return;
   }
-  // Get the team ID from the data attribute
-  const teamId = document.querySelector('#tableTeamPlayers').getAttribute('data-team-id');
-
-  // Check if teamId exists
   if (!teamId) {
-    console.error('team ID not found.');
+    console.error('Team ID not found.');
     return;
   }
 
-  // Initialize an array to store player IDs
-  const players = [];
+  // Determine the team name
+  const spanTeamName = document.getElementById('spanTeamName');
+  const oldTeamName = spanTeamName.getAttribute('data-team-name');
+  const inputTeamName = document.getElementById('inputTeamName');
+  const newTeamName = inputTeamName.value.trim();
+  let teamName = oldTeamName;
 
-  // Get all player rows from the table
-  const playerRows = document.querySelectorAll('#tableTeamPlayers tbody tr');
+  if (newTeamName) {
+    teamName = newTeamName;
+  } else if (!oldTeamName) {
+    alert('Please type in a team name');
+    return;
+  }
 
-  // Loop through each player row
-  playerRows.forEach(row => {
-    // Get the player ID from the data attribute
-    const playerId = row.getAttribute('data-player-id');
+  // Prepare data for team name update
+  const dataUpdateTeamName = {
+    teamId: teamId,
+    championshipId: championshipId,
+    teamName: teamName
+  };
 
+  if (teamId != 0 || teamId != '0') {
 
-    // Create an object for the player
-    const player = {
-      playerId: playerId
-    };
+    // Update the team name if necessary
+    fetch('/update_team_name', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dataUpdateTeamName)
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to update team name.');
+        }
+        return response.json(); // Optional: parse the response if further use is needed
+      })
+      .then(() => {
+        console.log('Team name updated successfully.');
+        alert(`Team name updated successfully from ${oldTeamName} to ${teamName}`);
+      })
+      .catch(error => {
+        console.error('Error updating team name:', error.message);
+      });
+  }
 
-    // Add the player ID to the array
-    players.push(player);
-  });
+  // Collect player IDs to add
+  const players = Array.from(document.querySelectorAll('#tableTeamPlayers tbody tr')).map(row => ({
+    playerId: row.getAttribute('data-player-id')
+  }));
 
-  // Prepare the data object to send to the server for removing players
+  // Data objects for adding and removing players
   const dataRemoveTeamPlayers = {
     championshipId: championshipId,
     teamId: teamId
   };
 
-  // Prepare the data object to send to the server for adding players
   const dataAddTeamPlayers = {
     players: players,
     championshipId: championshipId,
@@ -204,9 +219,10 @@ function sendDataToServer() {
     teamName: teamName
   };
 
-  if (teamId == 0 || teamId == '0') {
-    if (dataAddTeamPlayers.players.length > 0) {
-
+  // Adding or replacing players based on the teamId value
+  if (teamId === '0') {
+    // Adding players to a new team
+    if (players.length > 0) {
       fetch('/add_players_to_team', {
         method: 'POST',
         headers: {
@@ -216,25 +232,19 @@ function sendDataToServer() {
       })
         .then(response => {
           if (!response.ok) {
-            // Handle error response
             throw new Error('Failed to add players to championship.');
           }
-          // Handle success response
           console.log('Players added successfully.');
           alert('Editions recorded successfully');
-
         })
         .catch(error => {
-          // Handle error
-          console.error(error);
+          console.error('Error adding players:', error.message);
         });
     } else {
-      // Return a resolved promise since there are no players to add
-      return Promise.resolve();
+      console.log('No players to add.');
     }
-
   } else {
-
+    // Replace players for an existing team by removing all first
     fetch('/remove_all_players_from_team', {
       method: 'DELETE',
       headers: {
@@ -244,16 +254,12 @@ function sendDataToServer() {
     })
       .then(response => {
         if (!response.ok) {
-          // Handle error response
           throw new Error('Failed to remove players from championship.');
         }
-        // Otherwise, return the response to continue processing
         return response.json();
       })
       .then(() => {
-        // Check if players array is not empty before proceeding
-        if (dataAddTeamPlayers.players.length > 0) {
-          // Now, send data to add players to the championship
+        if (players.length > 0) {
           return fetch('/add_players_to_team', {
             method: 'POST',
             headers: {
@@ -262,26 +268,21 @@ function sendDataToServer() {
             body: JSON.stringify(dataAddTeamPlayers)
           });
         } else {
-          // Return a resolved promise since there are no players to add
           return Promise.resolve();
         }
       })
       .then(response => {
-        if (!response.ok) {
-          // Handle error response
+        if (response && !response.ok) {
           throw new Error('Failed to add players to championship.');
         }
-        // Handle success response
         console.log('Players added successfully.');
         alert('Editions recorded successfully');
-
       })
       .catch(error => {
-        // Handle error
-        console.error(error);
+        console.error('Error updating players:', error.message);
       });
   }
-  // Send the data to the server to remove players from the championship
 }
+
 
 

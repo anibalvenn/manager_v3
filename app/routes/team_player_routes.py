@@ -66,6 +66,41 @@ def remove_all_players_from_team():
     else:
         return jsonify({'message': 'No players found for the specified team. No action required.'}), 200
 
+@team_player_bp.route('/update_team_name', methods=['PUT'])
+def update_team_name():
+    # Retrieve data from the request body
+    data = request.json
+    team_id = data.get('teamId')
+    championship_id = data.get('championshipId')
+    team_name = data.get('teamName')
+    print('name:', team_name, 'id:', team_id)
+
+    # Validate the presence of team ID
+    if not team_id:
+        return jsonify({'error': 'Missing team ID'}), 400
+
+    try:
+        # Call a method that performs the update (assuming it's a class method)
+        updated_team = Teams_Model.update_team(
+            team_id=team_id, championship_id=championship_id, team_name=team_name
+        )
+
+        if not updated_team:
+            return jsonify({'error': 'Team not found'}), 404
+
+        # Convert the team object to a dictionary or JSON response
+        team_response = {
+            'teamId': updated_team.TeamID,
+            'championshipId': updated_team.ChampionshipID,
+            'teamName': updated_team.team_name
+        }
+        print('Updated team:', team_response)
+
+        return jsonify({'message': 'Team updated successfully', 'team': team_response}), 200
+    except Exception as e:
+        # Handle any unexpected errors and return a 500 response
+        print('Error updating team:', str(e))
+        return jsonify({'error': 'Internal server error', 'details': str(e)}), 500
     
 def init_routes(app):
     app.register_blueprint(team_player_bp)
