@@ -66,6 +66,33 @@ def remove_all_players_from_team():
     else:
         return jsonify({'message': 'No players found for the specified team. No action required.'}), 200
 
+@team_player_bp.route('/delete_team/<int:team_id>', methods=['DELETE'])
+def delete_team(team_id):
+    # Wrap operations in a transaction
+    try:
+        # Delete the team itself
+        team = Teams_Model.query.get(team_id)
+        if not team:
+            return jsonify({'message': 'Team not found'}), 404
+        db.session.delete(team)
+
+        # Get all entries for the specified team ID
+        entries = Team_Members_Model.query.filter_by(TeamID=team_id).all()
+
+        if entries:
+            # Delete each team member
+            for entry in entries:
+                db.session.delete(entry)
+
+        # Commit all deletions in one transaction
+        db.session.commit()
+        return jsonify({'message': 'Team and all associated players removed successfully'}), 200
+
+    except Exception as e:
+        # Rollback transaction if any error occurs
+        db.session.rollback()
+        return jsonify({'message': f'Error deleting team or players: {str(e)}'}), 500
+    
 @team_player_bp.route('/update_team_name', methods=['PUT'])
 def update_team_name():
     # Retrieve data from the request body
