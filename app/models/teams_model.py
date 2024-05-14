@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy import desc
 
 class Teams_Model(db.Model):
     __tablename__ = 'teams'
@@ -39,10 +40,15 @@ class Teams_Model(db.Model):
 
     @classmethod
     def select_team(cls, team_id=None, championship_id=None):
-        """Selects teams based on team ID or championship ID."""
+        """Selects teams based on team ID or championship ID, ordered by team_id descending."""
+        query = cls.query.order_by(desc(cls.TeamID))  # Order by team_id descending
+
         if team_id:
-            return cls.query.get(team_id)
+            # Retrieves a single team by team_id. Since team_id is unique, sorting won't affect this.
+            return query.get(team_id)
         elif championship_id:
-            return cls.query.filter_by(ChampionshipID=championship_id).all()
+            # Retrieves all teams associated with a championship_id, sorted by team_id in descending order.
+            return query.filter_by(ChampionshipID=championship_id).all()
         else:
-            return cls.query.all()  # Return all teams if no specific filter is provided
+            # Returns all teams, sorted from highest to lowest team_id if no specific filter is provided.
+            return query.all()

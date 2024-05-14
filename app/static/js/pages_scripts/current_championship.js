@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
+  let currentChampionshipName = localStorage.getItem('currentChampionshipName')
+  if (currentChampionshipName) {
+    setCurrentChampionshipName(currentChampionshipName)
+  }
   const changeChampionshipButton = document.getElementById('btnChangeCurrentChampionship');
   const chooseChampionshipContainer = document.getElementById('chooseCurrentChampionship');
 
@@ -27,9 +31,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td class="truncate w-12">${championship.acronym}</td>
                 <td class="truncate w-12">${championship.championshipID}</td>
                 <td class="truncate w-12">
-                    <button class="btnSelectCurrentChampionship bg-green-500 text-white px-1 rounded">
-                        Select
-                    </button>
+                <button onclick='setCurrentChampionship(${championship.championshipID}, "${escape(championship.name)}")' class="btnSelectCurrentChampionship bg-green-500 text-white px-1 rounded">
+                Select
+            </button>
+            
                 </td>
             `;
             tableBody.appendChild(row);
@@ -63,8 +68,23 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  document.getElementById('btnCloseCurrentChampionships').addEventListener('click', ()=> {
+  document.getElementById('btnCloseCurrentChampionships').addEventListener('click', () => {
     const modal = document.getElementById('chooseCurrentChampionship');
     modal.style.display = 'none';
   });
+
 });
+
+function setCurrentChampionship(championshipID, championshipName) {
+  localStorage.setItem('currentChampionshipID', championshipID);
+  localStorage.setItem('currentChampionshipName', championshipName);
+  setCurrentChampionshipName(championshipName)
+  window.location.reload();
+
+
+}
+function setCurrentChampionshipName(championshipName) {
+  const headerChampionshipName = document.getElementById('spanCurrentChampionshipName')
+  headerChampionshipName.innerText = championshipName
+
+}

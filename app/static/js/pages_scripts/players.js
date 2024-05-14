@@ -62,12 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
       })
         .then(response => {
           if (response.ok) {
-            alert('Player added successfully');
-            // Clear input fields
-            document.getElementById('inputPlayerName').value = '';
-            document.getElementById('inputPlayerBirth').value = '';
-            document.querySelector('input[name="sex"]:checked').checked = false;
-            document.getElementById('inputPlayerCountry').value = '';
+            window.location.reload()
           } else {
             throw new Error('Failed to add player');
           }
@@ -208,8 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
       .then(response => {
         if (response.ok) {
-          alert('Player updated successfully');
-          hideEditModal()
+          window.location.reload()
           // Optionally, hide the modal or refresh the player list
         } else {
           throw new Error('Failed to update player');
@@ -283,33 +277,33 @@ document.addEventListener('DOMContentLoaded', function () {
     hideEditModal();
   });
 
-      // Get the input element
-      const inputSearchPlayer = document.getElementById('playerSearch');
+  // Get the input element
+  const inputSearchPlayer = document.getElementById('playerSearch');
 
-      // Add an event listener to the input field
-      inputSearchPlayer.addEventListener('input', () => {
-        console.log('input')
-          // Get the value of the input field
-          const searchTerm = inputSearchPlayer.value.toLowerCase();
-  
-          // Get all <tr> elements
-          const playerRows = document.querySelectorAll('#playersTable tbody tr');
-  
-          // Loop through each <tr> element
-          playerRows.forEach(row => {
-              // Get the player name and player ID from the <td> elements inside the <tr>
-              const playerName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-  
-              // Check if the player name or player ID contains the search term
-              if (playerName.includes(searchTerm) ) {
-                  // If it does, display the row
-                  row.style.display = 'table-row';
-              } else {
-                  // If not, hide the row
-                  row.style.display = 'none';
-              }
-          });
-      });
+  // Add an event listener to the input field
+  inputSearchPlayer.addEventListener('input', () => {
+    console.log('input')
+    // Get the value of the input field
+    const searchTerm = inputSearchPlayer.value.toLowerCase();
+
+    // Get all <tr> elements
+    const playerRows = document.querySelectorAll('#playersTable tbody tr');
+
+    // Loop through each <tr> element
+    playerRows.forEach(row => {
+      // Get the player name and player ID from the <td> elements inside the <tr>
+      const playerName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+
+      // Check if the player name or player ID contains the search term
+      if (playerName.includes(searchTerm)) {
+        // If it does, display the row
+        row.style.display = 'table-row';
+      } else {
+        // If not, hide the row
+        row.style.display = 'none';
+      }
+    });
+  });
 
 });
 

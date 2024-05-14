@@ -270,7 +270,6 @@ function removeAllPlayersFromTeam(dataRemoveTeamPlayers) {
     return response.json(); // You can use the response if needed
   });
 }
-
 // Function to add players to a team
 function addPlayersToTeam(dataAddTeamPlayers) {
   return fetch('/add_players_to_team', {
@@ -284,7 +283,17 @@ function addPlayersToTeam(dataAddTeamPlayers) {
     if (!response.ok) {
       throw new Error('Failed to add players to the team.');
     }
-    alert("Team insertion succesful");
-    return response.json(); // Optional: parse response data if required
+    return response.json(); // Move JSON parsing here to handle based on response status
+  })
+  .then(data => { // Assuming 'data' contains meaningful info about the operation's success
+    if (dataAddTeamPlayers.teamId === '0') {
+      window.location.href = '/teams.html'; // Redirect to the teams page
+    } else {
+      alert("Team insertion successful");
+    }
+  })
+  .catch(error => { // Handle any errors from fetch or from response handling
+    console.error('Error:', error);
+    alert("Error adding team");
   });
 }

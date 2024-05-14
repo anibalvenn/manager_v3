@@ -1,42 +1,66 @@
 document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btnCreateNewTeam').addEventListener('click', function () {
-    window.location.href = '/edit_team_players/1/0'; // Redirect to edit_team_players.html
-  });
-         // Get the input element
-         const inputSearchTeam = document.getElementById('teamSearch');
+    let currentChampionshipID = localStorage.getItem('currentChampionshipID')
+    if (currentChampionshipID) {
 
-         // Add an event listener to the input field
-         inputSearchTeam.addEventListener('input', () => {
-           console.log('input')
-             // Get the value of the input field
-             const searchTerm = inputSearchTeam.value.toLowerCase();
-     
-             // Get all <tr> elements
-             const teamsRows = document.querySelectorAll('#teamTable tbody tr');
-     
-             // Loop through each <tr> element
-             teamsRows.forEach(row => {
-                 // Get the player name and player ID from the <td> elements inside the <tr>
-                 const teamName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-                 const teamId = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-     
-                 // Check if the player name or player ID contains the search term
-                 if (teamName.includes(searchTerm)||teamId.includes(searchTerm) ) {
-                     // If it does, display the row
-                     row.style.display = 'table-row';
-                 } else {
-                     // If not, hide the row
-                     row.style.display = 'none';
-                 }
-             });
-         });
+      window.location.href = `/edit_team_players/${currentChampionshipID}/0`; // Redirect to edit_team_players.html
+    } else {
+      alert('Please click CHANGE to select a championship')
+    }
+  });
+
+
+
+  // Get the input element
+  const inputSearchTeam = document.getElementById('teamSearch');
+
+  // Add an event listener to the input field
+  inputSearchTeam.addEventListener('input', () => {
+    console.log('input')
+    // Get the value of the input field
+    const searchTerm = inputSearchTeam.value.toLowerCase();
+
+    // Get all <tr> elements
+    const teamsRows = document.querySelectorAll('#teamTable tbody tr');
+
+    // Loop through each <tr> element
+    teamsRows.forEach(row => {
+      // Get the player name and player ID from the <td> elements inside the <tr>
+      const teamName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+      const teamId = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+      // Check if the player name or player ID contains the search term
+      if (teamName.includes(searchTerm) || teamId.includes(searchTerm)) {
+        // If it does, display the row
+        row.style.display = 'table-row';
+      } else {
+        // If not, hide the row
+        row.style.display = 'none';
+      }
+    });
+  });
 })
 
 
 document.addEventListener('DOMContentLoaded', function () {
+  let currentChampionshipID = localStorage.getItem('currentChampionshipID')
 
   const teamsTableBody = document.getElementById('teamTableBody');
 
+
+  if (currentChampionshipID) {
+
+    // Fetch championship data from the server
+    fetch(`/get_teams/${currentChampionshipID}`)
+      .then(response => response.json())
+      .then(data => {
+        renderTeams(data); // Render fetched data in the table
+      })
+      .catch(error => {
+        console.error('Error fetching championship data:', error);
+      });
+
+  }
   function createTeamRow(team) {
     const row = document.createElement('tr');
     row.setAttribute('data-team-id', team.teamID);
@@ -87,16 +111,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   };
-  // Fetch championship data from the server
-  fetch('/get_teams/2')
-    .then(response => response.json())
-    .then(data => {
-      renderTeams(data); // Render fetched data in the table
-    })
-    .catch(error => {
-      console.error('Error fetching championship data:', error);
-    });
-
   // Function to render championship data in the table
   function renderTeams(teams) {
     // Clear existing table rows

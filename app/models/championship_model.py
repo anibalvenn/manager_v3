@@ -1,5 +1,6 @@
 from app import db
 from datetime import date
+from sqlalchemy import desc
 
 class Championship_Model(db.Model):
     __tablename__ = 'championships'
@@ -45,7 +46,7 @@ class Championship_Model(db.Model):
     @classmethod
     def select_championship(cls, championship_id=None, name=None, acronym=None):
         """Selects championships based on given parameters."""
-        query = cls.query
+        query = cls.query.order_by(desc(cls.ChampionshipID))  # Order by ChampionshipID descending
 
         if championship_id:
             return query.filter_by(ChampionshipID=championship_id).first()

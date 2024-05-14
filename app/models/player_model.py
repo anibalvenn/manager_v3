@@ -1,5 +1,6 @@
 from app import db
 from datetime import date
+from sqlalchemy import desc
 
 class Player_Model(db.Model):
     __tablename__ = 'players'
@@ -47,7 +48,7 @@ class Player_Model(db.Model):
     @classmethod
     def select_player(cls, player_id=None, name=None, sex=None, birthdate=None, country=None):
         """Selects players based on given parameters."""
-        query = cls.query
+        query = cls.query.order_by(desc(cls.PlayerID))  # Order by player_id descending
 
         # Building the query based on provided parameters
         if player_id:

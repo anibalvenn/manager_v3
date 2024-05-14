@@ -60,11 +60,11 @@ document.addEventListener('DOMContentLoaded', function () {
       })
         .then(response => {
           if (response.ok) {
-            alert('championship added successfully');
-            // Clear input fields
-            document.getElementById('inputChampionshipName').value = '';
-            document.getElementById('inputChampionshipStart').value = '';
-            document.getElementById('inputChampionshipAcronym').value = '';
+            window.location.reload()
+            // // Clear input fields
+            // document.getElementById('inputChampionshipName').value = '';
+            // document.getElementById('inputChampionshipStart').value = '';
+            // document.getElementById('inputChampionshipAcronym').value = '';
           } else {
             throw new Error('Failed to add championship');
           }
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
     playersButton.textContent = 'Players';
     playersButton.className = 'bg-green-500 text-white hover:bg-green-600 px-3 py-1 rounded-md players-button';
     playersButton.addEventListener('click', () => {
-     console.log(championship.championshipID)
+      console.log(championship.championshipID)
       window.location.href = `/championship_players/${championship.championshipID}`;
 
     });
@@ -216,9 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
       .then(response => {
         if (response.ok) {
-          alert('Championship updated successfully');
-          // Close the modal after successful update
-          hideEditModal();
+          window.location.reload()
         } else {
           throw new Error('Failed to update championship');
         }
@@ -229,33 +227,33 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   });
 
-       // Get the input element
-       const inputSearchChampionship = document.getElementById('championshipSearch');
+  // Get the input element
+  const inputSearchChampionship = document.getElementById('championshipSearch');
 
-       // Add an event listener to the input field
-       inputSearchChampionship.addEventListener('input', () => {
-         console.log('input')
-           // Get the value of the input field
-           const searchTerm = inputSearchChampionship.value.toLowerCase();
-   
-           // Get all <tr> elements
-           const championshipRows = document.querySelectorAll('#championshipTable tbody tr');
-   
-           // Loop through each <tr> element
-           championshipRows.forEach(row => {
-               // Get the player name and player ID from the <td> elements inside the <tr>
-               const championshipName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-   
-               // Check if the player name or player ID contains the search term
-               if (championshipName.includes(searchTerm) ) {
-                   // If it does, display the row
-                   row.style.display = 'table-row';
-               } else {
-                   // If not, hide the row
-                   row.style.display = 'none';
-               }
-           });
-       });
+  // Add an event listener to the input field
+  inputSearchChampionship.addEventListener('input', () => {
+    console.log('input')
+    // Get the value of the input field
+    const searchTerm = inputSearchChampionship.value.toLowerCase();
+
+    // Get all <tr> elements
+    const championshipRows = document.querySelectorAll('#championshipTable tbody tr');
+
+    // Loop through each <tr> element
+    championshipRows.forEach(row => {
+      // Get the player name and player ID from the <td> elements inside the <tr>
+      const championshipName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+
+      // Check if the player name or player ID contains the search term
+      if (championshipName.includes(searchTerm)) {
+        // If it does, display the row
+        row.style.display = 'table-row';
+      } else {
+        // If not, hide the row
+        row.style.display = 'none';
+      }
+    });
+  });
 
 });
 
