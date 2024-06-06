@@ -9,12 +9,33 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages_scripts/series.js') }}"></script>
+
 </head>
 
 <body>
   {% include 'navbar.html' %}
   {% include 'change_current_championship.html' %}
-
+  <div class="max-w-7xl mx-auto bg-black">
+    <div id="divAddNewSeries" class="flex items-center justify-center space-x-4 mb-4 bg-gray-800 p-2">
+      <form id="formAddNewSeries" action="" class="flex items-center space-x-2 bg-gray-900 px-5 rounded-md">
+        <div id="divCounterRandomSeries" class="flex flex-col items-center space-y-2">
+          <label for="counterRandomSeries" class="text-white">Ho many random series?</label>
+          <div class="flex items-center space-x-2">
+            <input id="counterRandomSeries" type="number" class="w-16 text-center bg-gray-700 text-white rounded-md" value="1" min="1" max="12">
+          </div>
+        </div>
+        <div id="divCounterPlayersPerTischRandomSeries" class="flex flex-col items-center space-y-2">
+          <label for="counterPlayersPerTisch" class="text-white">How many Players per Tisch?</label>
+          <div class="flex items-center space-x-2">
+            <input id="counterPlayersPerTisch" type="number" class="w-16 text-center bg-gray-700 text-white rounded-md" value="3" min="3" max="4">
+          </div>
+        </div>
+      </form>
+      <button id="btnAddRandomSeries" class="px-4 py-2 bg-blue-500 text-white rounded-md">Add <span id="spanRandonSeriesCounter">1</span> Random Series</button>
+    </div>
+       
+  </div>
 
   <!-- Your content for championships page goes here -->
 </body>

@@ -4,29 +4,29 @@ class Tische_Model(db.Model):
     __tablename__ = 'tische'
     TischID = db.Column(db.Integer, primary_key=True)
     SeriesID = db.Column(db.Integer, db.ForeignKey('series.SeriesID'))
-    table_name = db.Column(db.Text, nullable=False)
+    tisch_name = db.Column(db.Text, nullable=False)
     PosA = db.Column(db.Integer, db.ForeignKey('players.PlayerID'), nullable=True)
     PosB = db.Column(db.Integer, db.ForeignKey('players.PlayerID'), nullable=True)
     PosC = db.Column(db.Integer, db.ForeignKey('players.PlayerID'), nullable=True)
     PosD = db.Column(db.Integer, db.ForeignKey('players.PlayerID'), nullable=True)
 
     @classmethod
-    def insert_tisch(cls, series_id, table_name, pos_a=None, pos_b=None, pos_c=None, pos_d=None):
+    def insert_tisch(cls, series_id, tisch_name, pos_a=None, pos_b=None, pos_c=None, pos_d=None):
         """Inserts a new tisch (table) with optional player positions into the database."""
-        new_tisch = cls(SeriesID=series_id, table_name=table_name, PosA=pos_a, PosB=pos_b, PosC=pos_c, PosD=pos_d)
+        new_tisch = cls(SeriesID=series_id, tisch_name=tisch_name, PosA=pos_a, PosB=pos_b, PosC=pos_c, PosD=pos_d)
         db.session.add(new_tisch)
         db.session.commit()
         return new_tisch
 
     @classmethod
-    def update_tisch(cls, tisch_id, series_id=None, table_name=None, pos_a=None, pos_b=None, pos_c=None, pos_d=None):
+    def update_tisch(cls, tisch_id, series_id=None, tisch_name=None, pos_a=None, pos_b=None, pos_c=None, pos_d=None):
         """Updates an existing tisch's information including player positions."""
         tisch = cls.query.get(tisch_id)
         if tisch:
             if series_id is not None:
                 tisch.SeriesID = series_id
-            if table_name is not None:
-                tisch.table_name = table_name
+            if tisch_name is not None:
+                tisch.tisch_name = tisch_name
             if pos_a is not None:
                 tisch.PosA = pos_a
             if pos_b is not None:
