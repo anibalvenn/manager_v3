@@ -1,5 +1,6 @@
 from app.models import Championship_Player_Model, Player_Model, Championship_Model
 from app import db
+from app.models.series_player_model import Series_Players_Model
 
 def get_players_for_series(championship_id):
     # Query all players with their group information for the given championship
@@ -24,3 +25,41 @@ def get_players_for_series(championship_id):
 
   
     return registered_players
+
+def get_players_for_simple_series_results(serie_id, championship_id):
+    # Query players registered for the given championship
+    registered_players_from_selection = Championship_Player_Model.select_championship_players_by_championship_id(championship_id=championship_id)
+
+    # Extract PlayerIDs of registered players for the championship
+    registered_player_ids = [player.PlayerID for player in registered_players_from_selection]
+
+    # Query all players with their series information for the given series, restricted to registered players
+    registered_players_with_series_data = (
+        db.session.query(
+            Player_Model.PlayerID,
+            Player_Model.name, 
+            Series_Players_Model.WonGames, 
+            Series_Players_Model.LostGames, 
+            Series_Players_Model.TablePoints, 
+            Series_Players_Model.TotalPoints
+        )
+        .outerjoin(Series_Players_Model, 
+                   (Player_Model.PlayerID == Series_Players_Model.PlayerID) & 
+                   (Series_Players_Model.SeriesID == serie_id))
+        .filter(Player_Model.PlayerID.in_(registered_player_ids))
+        .all()
+    )
+
+    players_data = []
+    for player_id, player_name, won_games, lost_games, table_points, total_points in registered_players_with_series_data:
+        player_data = {
+            'PlayerID': player_id,
+            'name': player_name,
+            'WonGames': won_games if won_games is not None else 0,
+            'LostGames': lost_games if lost_games is not None else 0,
+            'TablePoints': table_points if table_points is not None else 0,
+            'TotalPoints': total_points if total_points is not None else 0
+        }
+        players_data.append(player_data)
+
+    return players_data

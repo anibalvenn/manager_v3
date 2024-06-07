@@ -62,3 +62,14 @@ def init_routes(app):
                                registered_players=registered_players, 
                                series=series,
                                championship=championship)
+    
+    @app.route('/simple_serie_results/<int:championship_id>/<int:serie_id>')
+    def show_series_simple_results(championship_id, serie_id):
+        championship= Championship_Model().select_championship(championship_id=championship_id)
+        series=Series_Model().select_series(series_id=serie_id)
+        registered_players = series_players_service.get_players_for_simple_series_results(
+            serie_id=serie_id,championship_id=championship_id)
+        return render_template('simple_serie_results.html', 
+                               registered_players=registered_players, 
+                               series=series,
+                               championship=championship)

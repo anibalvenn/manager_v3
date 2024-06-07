@@ -12,7 +12,7 @@
 
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/pages_scripts/edit_serie_tische.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages_scripts/simple_series_results.js') }}"></script>
 
 </head>
 <div id="modalEditSerie" data-champioship-id="{{championship.ChampionshipID}}" data-serie-id="{{series.SeriesID}}"
@@ -21,7 +21,7 @@
     <div class="bg-white rounded-lg shadow-xl px-6 w-full h-full overflow-y-auto bg-gray-100">
       <div class="flex items-center justify-center flex-row"> <!-- Use flex utilities -->
 
-        <h1 class="font-bold text-center border-b border-gray-200 mx-2">Edit Serie
+        <h1 class="font-bold text-center border-b border-gray-200 mx-2">Points in Serie
           <span id="spanSerieName" data-serie-name="{{series.series_name}}">{{ series.series_name }}</span>
         </h1>
       </div>
@@ -39,21 +39,20 @@
               data-championship-id="{{championship_id}}" data-serie-id="{{serie_id}}">
               <thead class="bg-gray-100">
                 <tr>
-                  <th class="px-4 text-left w-1/20">x</th> <!-- New column for checkboxes -->
                   <th class="px-4 text-left w-3/5">Name</th>
                   <th class="px-4 text-left w-2/20">ID</th>
-                  <th class="px-4 text-left w-1/10">group</th>
+                  <th class="px-4 text-left w-1/10">Points</th>
                 </tr>
               </thead>
               <tbody>
                 {% for player in registered_players %}
                 <tr data-player-id="{{ player.PlayerID }}">
-                  <td> <input type="checkbox" class="w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                  </td>
-
                   <td class="px-4 truncate">{{ player.name }}</td>
                   <td class="px-4 truncate">{{ player.PlayerID }}</td>
-                  <td class="px-4 truncate"> {{ player.player_group }} </td>
+
+                  <td class="px-4 truncate"> 
+                    <input type="text" name="points" id="points_{{ player.PlayerID }}" class="w-16" value="{{ player.TotalPoints }}">
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -62,7 +61,7 @@
 
 
         </div>
-     
+
       </div>
       <div class="flex justify-center space-x-4 mt-4 py-1">
         <button id="closemodalEditSeries" class="bg-gray-300 hover:bg-gray-400 px-4 py-1 rounded-md">Cancel</button>

@@ -5,17 +5,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manager</title>
+  <title>Skat Results</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages_scripts/results.js') }}"></script>
+
 </head>
 
 <body>
   {% include 'navbar.html' %}
   {% include 'change_current_championship.html' %}
+  <div class="max-w-7xl mx-auto bg-black">
+ 
+  </div>
+  <div>
+    <h1 class="text-2xl font-bold text-center p-0 mt-0">Serien Results</h1>
 
+    <div id="selectSerien">
+      <table id="serienTable" class="min-w-full divide-y divide-gray-400">
+        <thead class="bg-gray-50">
 
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Name
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Series ID
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Simple Results
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Complete Results
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Print results
+            </th>          
+          </tr>
+
+        </thead>
+        <tbody id="serienTableBody" class="bg-white divide-y divide-gray-200">
+
+          <!-- Additional serien rows go here -->
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
   <!-- Your content for championships page goes here -->
 </body>
 
