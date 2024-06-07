@@ -26,4 +26,3 @@ def get_championship_name(championship_id):
     championship= Championship_Model.get_championship_name(championship_id)
 
     return championship
-

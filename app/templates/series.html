@@ -17,26 +17,98 @@
   {% include 'navbar.html' %}
   {% include 'change_current_championship.html' %}
   <div class="max-w-7xl mx-auto bg-black">
-    <div id="divAddNewSeries" class="flex items-center justify-center space-x-4 mb-4 bg-gray-800 p-2">
-      <form id="formAddNewSeries" action="" class="flex items-center space-x-2 bg-gray-900 px-5 rounded-md">
-        <div id="divCounterRandomSeries" class="flex flex-col items-center space-y-2">
-          <label for="counterRandomSeries" class="text-white">Ho many random series?</label>
-          <div class="flex items-center space-x-2">
-            <input id="counterRandomSeries" type="number" class="w-16 text-center bg-gray-700 text-white rounded-md" value="1" min="1" max="12">
-          </div>
-        </div>
-        <div id="divCounterPlayersPerTischRandomSeries" class="flex flex-col items-center space-y-2">
-          <label for="counterPlayersPerTisch" class="text-white">How many Players per Tisch?</label>
-          <div class="flex items-center space-x-2">
-            <input id="counterPlayersPerTisch" type="number" class="w-16 text-center bg-gray-700 text-white rounded-md" value="3" min="3" max="4">
-          </div>
-        </div>
-      </form>
-      <button id="btnAddRandomSeries" class="px-4 py-2 bg-blue-500 text-white rounded-md">Add <span id="spanRandonSeriesCounter">1</span> Random Series</button>
-    </div>
-       
-  </div>
+    <div id="divAddNewSeries" class="flex items-center justify-center space-x-4 bg-gray-800 p-1">
+      <div>
+        <p class="text-white text-center text-2xl font-bold">
+          Create
 
+          Serien
+        </p>
+
+        <p class="text-white text-center text-xs">*All random Serien shall be created at once</p>
+        <p class="text-white text-center text-xs"> Ranked Serien Tische shall be created through respective "edit"
+          button
+        </p>
+
+      </div>
+      <form id="formAddRandomSeries" action="" class="flex items-center space-x-2 bg-gray-900 px-5 rounded-md">
+        <div id="divCounterRandomSeries"
+          class="flex flex-col items-center space-y-2 rounded border-2 border-yellow-400 px-1">
+          <label for="inputCounterSeries" class="text-white">How many Serien?</label>
+          <div class="flex items-center space-x-2">
+            <input id="inputCounterSeries" type="number"
+              class="w-16 text-center bg-gray-700 text-white rounded-md" value="1" min="1" max="12">
+          </div>
+        </div>
+        <div id="divinputCounterPlayersPerRandomTisch"
+          class="flex flex-col items-center space-y-2 rounded border-2 border-yellow-400 px-1">
+          <label for="inputCounterPlayersPerTisch" class="text-white">Players/Tisch</label>
+          <div class="flex items-center space-x-2">
+            <input id="inputCounterPlayersPerTisch" type="number"
+              class="w-16 text-center bg-gray-700 text-white rounded-md" value="4" min="3" max="4">
+          </div>
+        </div>
+        <div id="divRadioButtonRandomRanked"
+        class="flex flex-col items-center space-y-2 rounded border-2 border-yellow-400 px-1">
+        <div class="flex flex-col items-start space-y-2">
+            <div class="flex items-center space-x-2">
+                <input type="radio" id="rankedOption" name="ranking" value="Ranked" class="bg-gray-700 text-white rounded-md">
+                <label for="rankedOption" class="text-white">Ranked</label>
+            </div>
+            <div class="flex items-center space-x-2">
+                <input type="radio" id="randomOption" name="ranking" value="Random" class="bg-gray-700 text-white rounded-md" checked>
+                <label for="randomOption" class="text-white">Random</label>
+            </div>
+        </div>
+    </div>
+    
+      </form>
+      <button id="btnAddSeries" class="px-4 py-2 bg-blue-500 text-white rounded-md">Add <span
+          id="spanSeriesCounter">1</span> <span id="spanMirrorSeriesType"
+          class="  rounded font-bold">
+          Random</span> Serien</button>
+    </div>
+
+
+  </div>
+  <div>
+    <h1 class="text-2xl font-bold text-center p-0 mt-0">Alle Serien</h1>
+
+    <div id="selectSerien">
+      <table id="serienTable" class="min-w-full divide-y divide-gray-400">
+        <thead class="bg-gray-50">
+
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Name
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Series ID
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Type
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Players/Tisch
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Edit
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Delete
+            </th>
+          </tr>
+
+        </thead>
+        <tbody id="serienTableBody" class="bg-white divide-y divide-gray-200">
+
+          <!-- Additional serien rows go here -->
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
   <!-- Your content for championships page goes here -->
 </body>
 

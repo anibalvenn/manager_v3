@@ -1,5 +1,7 @@
 from flask import render_template
-from app.services import championship_players_service, team_players_service
+from app.models.championship_model import Championship_Model
+from app.models.series_model import Series_Model
+from app.services import championship_players_service, series_players_service, team_players_service
 
 # routes/view_routes.py
 def init_routes(app):
@@ -50,3 +52,13 @@ def init_routes(app):
 
         return render_template('edit_team_players.html', team_name=team_name,team_id=team_id, team_players=team_players,
                                other_players=other_players, championship_id=championship_id)
+  
+    @app.route('/edit_serie_tische/<int:championship_id>/<int:serie_id>')
+    def show_series_players(championship_id, serie_id):
+        championship= Championship_Model().select_championship(championship_id=championship_id)
+        registered_players = series_players_service.get_players_for_series(championship_id)
+        series=Series_Model().select_series(series_id=serie_id)
+        return render_template('edit_serie_tische.html', 
+                               registered_players=registered_players, 
+                               series=series,
+                               championship=championship)
