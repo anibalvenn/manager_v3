@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   <script src="{{ url_for('static', filename='js/pages_scripts/simple_series_results.js') }}"></script>
 
@@ -36,7 +38,7 @@
           </div>
           <div class="h-96 overflow-y-auto">
             <table id="tableSeriePlayers" class="mt-2 w-full border-b border-gray-200 text-sm "
-              data-championship-id="{{championship_id}}" data-serie-id="{{serie_id}}">
+              data-championship-id="{{championship.ChampionshipID}}" data-serie-id="{{series.SeriesID}}">
               <thead class="bg-gray-100">
                 <tr>
                   <th class="px-4 text-left w-3/5">Name</th>
@@ -46,12 +48,13 @@
               </thead>
               <tbody>
                 {% for player in registered_players %}
-                <tr data-player-id="{{ player.PlayerID }}">
+                <tr data-player-id="{{ player.PlayerID }}" data-serie-id="{{ series.SeriesID }}">
                   <td class="px-4 truncate">{{ player.name }}</td>
                   <td class="px-4 truncate">{{ player.PlayerID }}</td>
 
-                  <td class="px-4 truncate"> 
-                    <input type="text" name="points" id="points_{{ player.PlayerID }}" class="w-16" value="{{ player.TotalPoints }}">
+                  <td class="px-4 truncate">
+                    <input type="text" name="points" id="points_{{ player.PlayerID }}" class="w-16"
+                      value="{{ player.TotalPoints }}">
                   </td>
                 </tr>
                 {% endfor %}
@@ -67,6 +70,7 @@
         <button id="closemodalEditSeries" class="bg-gray-300 hover:bg-gray-400 px-4 py-1 rounded-md">Cancel</button>
         <button id="btnSaveChangesModalEditSeries"
           class="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-md">Save Serie</button>
+        <button id="btnPDFGenerator">Generate PDF</button>
       </div>
     </div>
   </div>

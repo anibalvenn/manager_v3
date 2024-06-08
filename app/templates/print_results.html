@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Series Results</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+  <h1>Series Results</h1>
+  <input type="text" id="seriesId" placeholder="Enter Series ID">
+  <button onclick="generatePDF()">Generate PDF</button>
+
+  <script>
+    async function fetchResults(seriesId) {
+      const response = await fetch(`/api/get_series_rank?series_id=${seriesId}`);
+      const data = await response.json();
+      if (data.success) {
+        return data.data;
+      } else {
+        throw new Error(data.error);
+      }
+    }
+
+    async function generatePDF() {
+      const seriesId = document.getElementById('seriesId').value;
+      if (!seriesId) {
+        alert("Please enter a series ID");
+        return;
+      }
+
+      try {
+        const results = await fetchResults(seriesId);
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.text("Series Results", 10, 10);
+
+        let y = 20;
+        results.forEach((player, index) => {
+          doc.text(`${index + 1}. ${player.player_name} (ID: ${player.player_id}) - Total Points: ${player.total_points}`, 10, y);
+          y += 10;
+        });
+
+        doc.save('series_results.pdf');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Failed to generate PDF');
+      }
+    }
+  </script>
+</body>
+
+</html>

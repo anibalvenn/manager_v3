@@ -65,3 +65,8 @@ class Series_Players_Model(db.Model):
             query = query.filter(cls.TotalPoints >= min_total_points)
 
         return query.all()
+    
+    @classmethod
+    def select_series_players_ordered_by_total_points(cls, series_id):
+        """Selects series player records for a given series_id ordered by TotalPoints in descending order."""
+        return cls.query.filter_by(SeriesID=series_id).order_by(cls.TotalPoints.desc()).all()
