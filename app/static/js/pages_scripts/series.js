@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Create and append edit button
     const editCell = document.createElement('td');
     const editButton = document.createElement('button');
-    editButton.textContent = 'Edit';
+    editButton.textContent = 'Sort Players';
     editButton.className = 'bg-yellow-600 text-white hover:bg-yellow-900 px-3 py-1 rounded-md edit-button';
     editButton.addEventListener('click', () => {
       // Get the championship data from the row

@@ -36,10 +36,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    async function generatePDF() {
-        // const seriesId = document.getElementById('seriesId').value;
-        const modalEditSerie= document.getElementById('modalEditSerie')
-        const seriesId = modalEditSerie.getAttribute('data-serie-id')
+    async function generatePDFSeriesResult() {
+        const modalEditSerie = document.getElementById('modalEditSerie');
+        const seriesId = modalEditSerie.getAttribute('data-serie-id');
+        const seriesName = modalEditSerie.getAttribute('data-serie-name');
         if (!seriesId) {
             alert("Please enter a series ID");
             return;
@@ -51,12 +51,57 @@ document.addEventListener('DOMContentLoaded', function () {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            doc.text("Series Results", 10, 10);
+            // Center the main title
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const title = "Series Results";
+            const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
+            doc.setFontSize(18);
+            doc.text(title, titleX, 20);
 
-            let y = 20;
+            // Add the series name and ID below the main title
+            doc.setFontSize(10);
+            const seriesInfo = `Series Name: ${seriesName}, Overall ID: ${seriesId}`;
+            const seriesInfoX = (pageWidth - doc.getTextWidth(seriesInfo)) / 2;
+            doc.text(seriesInfo, seriesInfoX, 26);
+
+            // Prepare table data
+            const tableColumn = ["Rank", "Player Name, ID", "Total Points"];
+            const tableRows = [];
+
             results.forEach((player, index) => {
-                doc.text(`${index + 1}. ${player.player_name} (ID: ${player.player_id}) - Total Points: ${player.total_points}`, 10, y);
-                y += 10;
+                const playerData = [
+                    index + 1, // Rank
+                    `${player.player_name}, ${player.player_id}`, // Player Name with ID
+                    player.total_points // Total Points
+                ];
+                tableRows.push(playerData);
+            });
+
+            // AutoTable plugin to generate table
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 30, // Adjust startY to move the table down
+                theme: 'grid',
+                styles: {
+                    cellPadding: 1, // Decrease the cell padding to reduce row height
+                    fontSize: 10,
+                    valign: 'middle', // Change to middle to vertically center the content
+                    halign: 'left'
+                },
+                columnStyles: {
+                    0: { cellWidth: '10%' },
+                    1: { cellWidth: '80%' },
+                    2: { cellWidth: '10%' }
+                },
+                alternateRowStyles: {
+                    fillColor: [224, 235, 255] // Soft green background for alternate rows
+                },
+                headStyles: {
+                    fillColor: [255, 255, 255],
+                    textColor: [0, 0, 0],
+                    fontStyle: 'bold'
+                },
             });
 
             doc.save('series_results.pdf');
@@ -65,11 +110,25 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Failed to generate PDF');
         }
     }
+
+
+
     const btnGeneratePDF = document.getElementById('btnPDFGenerator');
     btnGeneratePDF.addEventListener('click', () => {
         // Get the championship data from the row
-        generatePDF()
+        generatePDFSeriesResult()
 
 
+    });
+    const btnBackToResults = document.getElementById('closeModalEditSimplesResults');
+    btnBackToResults.addEventListener('click', () => {
+        // Get the championship data from the row
+        window.location.href = "/results.html"
+
+    });
+    const btnSaveChangesSimpleResults = document.getElementById('btnSaveChangesSimpleResults');
+    btnSaveChangesSimpleResults.addEventListener('click', () => {
+        // Get the championship data from the row
+        alert('Changes saved succesfully')
     });
 })

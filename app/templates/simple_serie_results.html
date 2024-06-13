@@ -12,12 +12,14 @@
 
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+
 
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   <script src="{{ url_for('static', filename='js/pages_scripts/simple_series_results.js') }}"></script>
 
 </head>
-<div id="modalEditSerie" data-champioship-id="{{championship.ChampionshipID}}" data-serie-id="{{series.SeriesID}}"
+<div id="modalEditSerie" data-champioship-id="{{championship.ChampionshipID}}" data-serie-id="{{series.SeriesID}}" data-serie-name="{{series.series_name}}"
   class="fixed top-0 left-0 z-10 w-full h-full overflow-y-auto">
   <div class="flex items-center justify-center h-full ">
     <div class="bg-white rounded-lg shadow-xl px-6 w-full h-full overflow-y-auto bg-gray-100">
@@ -67,10 +69,10 @@
 
       </div>
       <div class="flex justify-center space-x-4 mt-4 py-1">
-        <button id="closemodalEditSeries" class="bg-gray-300 hover:bg-gray-400 px-4 py-1 rounded-md">Cancel</button>
-        <button id="btnSaveChangesModalEditSeries"
+        <button id="closeModalEditSimplesResults" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-md">Back</button>
+        <button id="btnSaveChangesSimpleResults"
           class="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-md">Save Serie</button>
-        <button id="btnPDFGenerator">Generate PDF</button>
+        <button id="btnPDFGenerator" class="bg-blue-200 hover:bg-blue-300 px-4 py-1 rounded-md">Print Series Results</button>
       </div>
     </div>
   </div>

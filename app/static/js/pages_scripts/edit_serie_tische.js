@@ -1,62 +1,39 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-  const closeModalButton = document.getElementById('closemodalEditTeams');
+  const closeModalEditSerieTische = document.getElementById('closeModalEditSerieTische');
+  closeModalEditSerieTische.addEventListener('click', () => {
+    console.log('click')
+    // Get the championship data from the row
+    window.location.href = "/series.html"
 
-  closeModalButton.addEventListener('click', () => {
-    window.location.href = '/teams.html'; // Redirect to the championships page
   });
 
-  const btnSendDataToServer = document.getElementById("btnSaveChangesModalEditTeams")
-  btnSendDataToServer.addEventListener('click', () => {
-    sendDataToServer()
-  })
+
+
+  // const btnSendDataToServer = document.getElementById("btnSaveChangesModalEditTeams")
+  // btnSendDataToServer.addEventListener('click', () => {
+  //   sendDataToServer()
+  // })
 
   // Get the input element
-  const searchOtherPlayersInput = document.getElementById('searchOtherPlayers');
+  const searchSeriePlayersInput = document.getElementById('searchSeriePlayer');
 
   // Add an event listener to the input field
-  searchOtherPlayersInput.addEventListener('input', () => {
+  searchSeriePlayersInput.addEventListener('input', () => {
     // Get the value of the input field
-    const searchTerm = searchOtherPlayersInput.value.toLowerCase();
+    const searchTerm = searchSeriePlayersInput.value.toLowerCase();
+    console.log(searchTerm)
 
     // Get all <tr> elements
-    const playerRows = document.querySelectorAll('#tableOtherPlayers tbody tr');
+    const playerRows = document.querySelectorAll('#tableSeriePlayers tbody tr');
 
     // Loop through each <tr> element
     playerRows.forEach(row => {
       // Get the player name and player ID from the <td> elements inside the <tr>
-      const playerName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-      const playerID = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+      const playerName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
 
       // Check if the player name or player ID contains the search term
-      if (playerName.includes(searchTerm) || playerID.includes(searchTerm)) {
-        // If it does, display the row
-        row.style.display = 'table-row';
-      } else {
-        // If not, hide the row
-        row.style.display = 'none';
-      }
-    });
-  });
-  // Get the input element
-  const searchTeamsPlayersInput = document.getElementById('searchTeamPlayer');
-
-  // Add an event listener to the input field
-  searchTeamsPlayersInput.addEventListener('input', () => {
-    // Get the value of the input field
-    const searchTerm = searchTeamsPlayersInput.value.toLowerCase();
-
-    // Get all <tr> elements
-    const playerRows = document.querySelectorAll('#tableTeamPlayers tbody tr');
-
-    // Loop through each <tr> element
-    playerRows.forEach(row => {
-      // Get the player name and player ID from the <td> elements inside the <tr>
-      const playerName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-      const playerID = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-
-      // Check if the player name or player ID contains the search term
-      if (playerName.includes(searchTerm) || playerID.includes(searchTerm)) {
+      if (playerName.includes(searchTerm)) {
         // If it does, display the row
         row.style.display = 'table-row';
       } else {
@@ -66,77 +43,108 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  document.addEventListener('change', function (event) {
+    const checkbox = event.target;
+    if (checkbox.type === 'checkbox' && checkbox.checked) {
+      const checkboxes = document.querySelectorAll('tr input[type="checkbox"]');
+      checkboxes.forEach(cb => {
+        if (cb !== checkbox) {
+          cb.checked = false;
+        }
+      });
+    }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.altKey && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+      const checkedRows = document.querySelectorAll('tr input[type="checkbox"]:checked');
+      checkedRows.forEach(row => {
+        const currentRow = row.closest('tr');
+        const nextRow = currentRow.nextElementSibling;
+        const previousRow = currentRow.previousElementSibling;
 
-  addEventListenersToMoveButtons()
+        if (event.key === 'ArrowDown' && nextRow) {
+          nextRow.parentNode.insertBefore(nextRow, currentRow);
+          nextRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else if (event.key === 'ArrowUp' && previousRow) {
+          currentRow.parentNode.insertBefore(currentRow, previousRow);
+          currentRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+      applyRowGrouping('tableSeriePlayers');
+    }
+  });
+
+  applyRowGrouping('tableSeriePlayers');
 
 })
 
-// Function to move a player row to tablePlayersIn
-function movePlayerIn(playerRow) {
-  // Clone the entire row
-  const clonedRow = playerRow.cloneNode(true);
+function applyRowGrouping(tableId) {
+  const table = document.getElementById(tableId);
+  const seek4er = table.getAttribute('data-serie-seek4er') === 'True';
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  const totalRows = rows.length;
 
-  // Remove the original row from #tablePlayersOut
-  playerRow.remove();
+  if (totalRows !== 5) {
+    let remainder = seek4er ? totalRows % 4 : totalRows % 3;
+    let regularGroups = seek4er ? Math.floor(totalRows / 4) : Math.floor(totalRows / 3);
+    let extraGroups = 0;
 
-  // Add the cloned row to #tablePlayersIn
-  const tableTeamPlayersBody = document.querySelector('#tableTeamPlayers tbody');
-  tableTeamPlayersBody.appendChild(clonedRow);
+    if (seek4er) {
+      if (remainder === 1) {
+        extraGroups = 3;
+        regularGroups = Math.floor((totalRows - 9) / 4);
+      } else if (remainder === 2) {
+        extraGroups = 2;
+        regularGroups = Math.floor((totalRows - 6) / 4);
+      } else if (remainder === 3) {
+        extraGroups = 1;
+        regularGroups = Math.floor((totalRows - 3) / 4);
+      }
+    } else {
+      if (remainder === 1) {
+        extraGroups = 1;
+        regularGroups = Math.floor((totalRows - 4) / 3);
+      } else if (remainder === 2) {
+        extraGroups = 2;
+        regularGroups = Math.floor((totalRows - 8) / 3);
+      }
+    }
 
-  // Add event listener to move button within the cloned row
-  const moveButtonOut = clonedRow.querySelector('.btnMovePlayerOut');
-  moveButtonOut.addEventListener('click', () => {
-    const playerRow = moveButtonOut.closest('tr');
+    rows.forEach((row, index) => {
+      let groupIndex;
+      if (seek4er) {
+        if (index >= totalRows - (extraGroups * 3)) {
+          groupIndex = regularGroups + Math.floor((index - (totalRows - (extraGroups * 3))) / 3);
+        } else {
+          groupIndex = Math.floor(index / 4);
+        }
+      } else {
+        if (remainder === 0) {
+          groupIndex = Math.floor(index / 3);
+        } else {
+          if (remainder === 1 && index < 4) {
+            groupIndex = 0;
+          } else if (remainder === 2 && index < 8) {
+            groupIndex = Math.floor(index / 4);
+          } else {
+            groupIndex = Math.floor((index - (remainder === 1 ? 4 : 8)) / 3) + (remainder > 0 ? remainder : 0);
+          }
+        }
+      }
 
-    movePlayerOut(playerRow);
-  });
-}
+      row.setAttribute('data-tisch-index', groupIndex + 1);  // Add group index for debugging
 
-// Function to move a player row to tablePlayersOut
-function movePlayerOut(playerRow) {
-  // Clone the entire row
-  const clonedRow = playerRow.cloneNode(true);
+      // Replace the content of the specific <td> element with data-tisch-index value
+      const tischCell = row.querySelector('td:nth-child(4)');
+      if (tischCell) {
+        tischCell.textContent = groupIndex + 1;
+      }
 
-  // Remove the original row from #tablePlayersIn
-  playerRow.remove();
-
-  // Add the cloned row to #tablePlayersOut
-  const tablePlayersOutBody = document.querySelector('#tableOtherPlayers tbody');
-  tablePlayersOutBody.appendChild(clonedRow);
-
-  // Add event listener to move button within the cloned row
-  const moveButtonIn = clonedRow.querySelector('.btnMovePlayerIn');
-  moveButtonIn.addEventListener('click', () => {
-    const playerRow = moveButtonIn.closest('tr');
-    movePlayerIn(playerRow);
-  });
-}
-
-// Function to add event listeners to move buttons
-function addEventListenersToMoveButtons() {
-  // Get all buttons with the class .btnMovePlayerIn
-  const movePlayerInButtons = document.querySelectorAll('.btnMovePlayerIn');
-
-  // Add click event listener to each button
-  movePlayerInButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      // Get the parent <tr> element of the clicked button
-      const playerRow = button.closest('tr');
-      movePlayerIn(playerRow);
+      const bgColor = groupIndex % 2 === 0 ? 'bg-gray-200' : 'bg-gray-300';
+      row.classList.remove('bg-gray-200', 'bg-gray-300'); // Remove previous background color
+      row.classList.add(bgColor);
     });
-  });
-
-  // Get all buttons with the class .btnMovePlayerOut
-  const movePlayerOutButtons = document.querySelectorAll('.btnMovePlayerOut');
-
-  // Add click event listener to each button
-  movePlayerOutButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      // Get the parent <tr> element of the clicked button
-      const playerRow = button.closest('tr');
-      movePlayerOut(playerRow);
-    });
-  });
+  }
 }
 
 function sendDataToServer() {
@@ -209,22 +217,22 @@ function sendDataToServer() {
     }
   } else {
     removeAllPlayersFromTeam(dataRemoveTeamPlayers)
-    .then(() => {
-      // Check if players are available to add before calling the add function
-      if (dataAddTeamPlayers.players.length > 0) {
-        return addPlayersToTeam(dataAddTeamPlayers);
-      } else {
-        // No players to add, resolve immediately
-        return Promise.resolve();
-      }
-    })
-    .then(() => {
-      console.log('Players updated successfully.');
-      alert('Editions recorded successfully');
-    })
-    .catch(error => {
-      console.error('Error updating players:', error.message);
-    });
+      .then(() => {
+        // Check if players are available to add before calling the add function
+        if (dataAddTeamPlayers.players.length > 0) {
+          return addPlayersToTeam(dataAddTeamPlayers);
+        } else {
+          // No players to add, resolve immediately
+          return Promise.resolve();
+        }
+      })
+      .then(() => {
+        console.log('Players updated successfully.');
+        alert('Editions recorded successfully');
+      })
+      .catch(error => {
+        console.error('Error updating players:', error.message);
+      });
   }
 }
 
@@ -263,12 +271,12 @@ function removeAllPlayersFromTeam(dataRemoveTeamPlayers) {
     },
     body: JSON.stringify(dataRemoveTeamPlayers)
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Failed to remove players from the team.');
-    }
-    return response.json(); // You can use the response if needed
-  });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to remove players from the team.');
+      }
+      return response.json(); // You can use the response if needed
+    });
 }
 // Function to add players to a team
 function addPlayersToTeam(dataAddTeamPlayers) {
@@ -279,21 +287,21 @@ function addPlayersToTeam(dataAddTeamPlayers) {
     },
     body: JSON.stringify(dataAddTeamPlayers)
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Failed to add players to the team.');
-    }
-    return response.json(); // Move JSON parsing here to handle based on response status
-  })
-  .then(data => { // Assuming 'data' contains meaningful info about the operation's success
-    if (dataAddTeamPlayers.teamId === '0') {
-      window.location.href = '/teams.html'; // Redirect to the teams page
-    } else {
-      alert("Team insertion successful");
-    }
-  })
-  .catch(error => { // Handle any errors from fetch or from response handling
-    console.error('Error:', error);
-    alert("Error adding team");
-  });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to add players to the team.');
+      }
+      return response.json(); // Move JSON parsing here to handle based on response status
+    })
+    .then(data => { // Assuming 'data' contains meaningful info about the operation's success
+      if (dataAddTeamPlayers.teamId === '0') {
+        window.location.href = '/teams.html'; // Redirect to the teams page
+      } else {
+        alert("Team insertion successful");
+      }
+    })
+    .catch(error => { // Handle any errors from fetch or from response handling
+      console.error('Error:', error);
+      alert("Error adding team");
+    });
 }

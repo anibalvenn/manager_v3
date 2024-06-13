@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const serieRow = completeResultsButton.closest('tr');
       const serieIdInRow = serieRow.getAttribute('data-serie-id')
 
-      window.location.href = `/edit_serie_tische/${currentChampionshipID}/${serieIdInRow}`;
+      window.location.href = `/complete_serie_results/${currentChampionshipID}/${serieIdInRow}`;//doesnt exist yet
 
     });
     completeResultsCell.appendChild(completeResultsButton);
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const serieRow = printResultsButton.closest('tr');
       const serieIdInRow = serieRow.getAttribute('data-serie-id')
 
-      window.location.href = `/edit_serie_tische/${currentChampionshipID}/${serieIdInRow}`;
+      window.location.href = `/print_results/${currentChampionshipID}/${serieIdInRow}`;//doesnt exist yet
 
     });
     printResultsCell.appendChild(printResultsButton);

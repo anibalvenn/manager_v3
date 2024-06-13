@@ -1,6 +1,9 @@
 from flask import render_template
 from app.models.championship_model import Championship_Model
+from app.models.championship_player_model import Championship_Player_Model
+from app.models.player_model import Player_Model
 from app.models.series_model import Series_Model
+from app.models.series_player_model import Series_Players_Model
 from app.services import championship_players_service, series_players_service, team_players_service
 
 # routes/view_routes.py
@@ -53,16 +56,38 @@ def init_routes(app):
         return render_template('edit_team_players.html', team_name=team_name,team_id=team_id, team_players=team_players,
                                other_players=other_players, championship_id=championship_id)
   
-    @app.route('/edit_serie_tische/<int:championship_id>/<int:serie_id>')
-    def show_series_players(championship_id, serie_id):
-        championship= Championship_Model().select_championship(championship_id=championship_id)
-        registered_players = series_players_service.get_players_for_series(championship_id)
-        series=Series_Model().select_series(series_id=serie_id)
+    @app.route('/edit_serie_tische/<int:championship_id>/<int:serie_id>', defaults={'rank_series_id': None})
+    @app.route('/edit_serie_tische/<int:championship_id>/<int:serie_id>/<int:rank_series_id>')
+    def show_series_players(championship_id, serie_id, rank_series_id):
+        championship = Championship_Model().select_championship(championship_id=championship_id)
+        series = Series_Model().select_series(series_id=serie_id)
+        if rank_series_id:
+            # Fetch the players ordered by total points for the specified series
+            players_ordered_by_points = Series_Players_Model.select_series_players_ordered_by_total_points(rank_series_id)
+            registered_players = []
+            for player in players_ordered_by_points:
+                player_info = Player_Model.query.filter_by(PlayerID=player.PlayerID).first()
+                if player_info:
+                    # Get the player group from Championship_Player_Model
+                    player_group_info = Championship_Player_Model.select_championship_player(player_id=player.PlayerID, championship_id=championship_id)
+                    player_group = player_group_info.player_group if player_group_info else None
+                    
+                    registered_players.append({
+                        'name': player_info.name,
+                        'PlayerID': player.PlayerID,
+                        'TotalPoints': player.TotalPoints,
+                        'player_group': player_group
+                    })
+        else:
+            # Fetch the players for the championship
+            registered_players = series_players_service.get_players_for_series(championship_id)
+
         return render_template('edit_serie_tische.html', 
-                               registered_players=registered_players, 
-                               series=series,
-                               championship=championship)
-    
+                            registered_players=registered_players, 
+                            series=series,
+                            championship=championship)
+
+        
     @app.route('/simple_serie_results/<int:championship_id>/<int:serie_id>')
     def show_series_simple_results(championship_id, serie_id):
         championship= Championship_Model().select_championship(championship_id=championship_id)
@@ -70,6 +95,6 @@ def init_routes(app):
         registered_players = series_players_service.get_players_for_simple_series_results(
             serie_id=serie_id,championship_id=championship_id)
         return render_template('simple_serie_results.html', 
-                               registered_players=registered_players, 
-                               series=series,
-                               championship=championship)
+                            registered_players=registered_players, 
+                            series=series,
+                            championship=championship)
