@@ -1,13 +1,47 @@
 
 document.addEventListener('DOMContentLoaded', function () {
+  const modalEditSerie = document.getElementById('modalEditSerie')
+  const championshipID = modalEditSerie.getAttribute('data-champioship-id')
+  const seriesID = parseInt(modalEditSerie.getAttribute('data-serie-id'))
+
   const closeModalEditSerieTische = document.getElementById('closeModalEditSerieTische');
   closeModalEditSerieTische.addEventListener('click', () => {
-    console.log('click')
     // Get the championship data from the row
     window.location.href = "/series.html"
 
   });
+  const openModalSelectSeriesID = document.getElementById('btnSortSeriesBySeriesIdResults');
+  openModalSelectSeriesID.addEventListener('click', () => {
+    openSelectSeriesID()
+  });
 
+  const closeModalSelectSeriesID = document.getElementById('closeModalSelectSeriesID');
+  closeModalSelectSeriesID.addEventListener('click', () => {
+    closeSelectSeriesID()
+  });
+  const btnSubmitSeriesID = document.getElementById('btnSubmitSeriesID');
+  btnSubmitSeriesID.addEventListener('click', () => {
+
+    const inputSelectSeriesID = document.getElementById('inputSelectSeriesID');
+    const selectedSeriesID = parseInt(inputSelectSeriesID.value, 10); // Adding radix 10
+
+    if (isNaN(selectedSeriesID)) {
+      alert('Please enter a valid series ID');
+      return;
+    }
+    if (selectedSeriesID >= seriesID) {
+      alert(`input a series ID lower than ${seriesID}`)
+    }else{
+      // Navigate to the new URL
+      window.location.href = `/edit_serie_tische/${championshipID}/${seriesID}/${selectedSeriesID}`;
+
+    }
+
+
+
+
+
+  });
 
 
   // const btnSendDataToServer = document.getElementById("btnSaveChangesModalEditTeams")
@@ -305,3 +339,18 @@ function addPlayersToTeam(dataAddTeamPlayers) {
       alert("Error adding team");
     });
 }
+
+
+function openSelectSeriesID() {
+  const divSelectSeriesID = document.getElementById('divSelectSeriesID');
+  divSelectSeriesID.classList.remove('hidden');
+
+}
+
+function closeSelectSeriesID() {
+  // Get the championship data from the row
+  const divSelectSeriesID = document.getElementById('divSelectSeriesID');
+  divSelectSeriesID.classList.add('hidden');
+
+}
+

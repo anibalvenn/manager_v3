@@ -81,6 +81,28 @@
   </div>
 </div>
 
+  <!-- the modal below shall be displayed when the user clicks "edit", and display the info of the player whose line was clicked -->
+  <div id="divSelectSeriesID" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen">
+      <div class="bg-white rounded-lg shadow-xl p-6 bg-yellow-100 relative">
+        <!-- Close button -->
+        <button id="closeModalSelectSeriesID"
+          class="absolute top-0 right-0 p-2 text-white bg-red-500 hover:bg-red-600 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Edit player form -->
+          <label for="inputSelectSeriesID">Series ID:</label>
+          <input id="inputSelectSeriesID" type="text" placeholder="Series ID"
+            class="border border-gray-300 px-4  rounded-md">   
+
+          <button id="btnSubmitSeriesID" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-md">Submit</button>
+
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
