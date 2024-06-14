@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   let currentChampionshipName = localStorage.getItem('currentChampionshipName')
   if (currentChampionshipName) {
-    setCurrentChampionshipName(currentChampionshipName)
+    setHeaderCurrentChampionshipName(currentChampionshipName)
   }
   const changeChampionshipButton = document.getElementById('btnChangeCurrentChampionship');
   const chooseChampionshipContainer = document.getElementById('chooseCurrentChampionship');
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td class="truncate w-12">${championship.acronym}</td>
                 <td class="truncate w-12">${championship.championshipID}</td>
                 <td class="truncate w-12">
-                <button onclick='setCurrentChampionship(${championship.championshipID}, "${escape(championship.name)}")' class="btnSelectCurrentChampionship bg-green-500 text-white px-1 rounded">
+                <button onclick='setCurrentChampionship(${championship.championshipID}, "${escape(championship.name)}", "${escape(championship.acronym)}")' class="btnSelectCurrentChampionship bg-green-500 text-white px-1 rounded">
                 Select
             </button>
             
@@ -75,15 +75,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-function setCurrentChampionship(championshipID, championshipName) {
+function setCurrentChampionship(championshipID, championshipName, championshipAcronym) {
   localStorage.setItem('currentChampionshipID', championshipID);
   localStorage.setItem('currentChampionshipName', championshipName);
-  setCurrentChampionshipName(championshipName)
+  localStorage.setItem('currentChampionshipAcronym', championshipAcronym);
+  setHeaderCurrentChampionshipName(championshipName)
   window.location.reload();
 
 
 }
-function setCurrentChampionshipName(championshipName) {
+function setHeaderCurrentChampionshipName(championshipName) {
   const headerChampionshipName = document.getElementById('spanCurrentChampionshipName')
   headerChampionshipName.innerText = championshipName
 

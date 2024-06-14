@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app import db
 from app.models.player_model import Player_Model
+from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
 
 # Create a Blueprint for series routes
@@ -64,6 +65,22 @@ def get_series_rank():
     except Exception as e:
         return jsonify(success=False, error=str(e)), 500
 
+@results_bp.route('/api/check_series', methods=['GET'])
+def check_series():
+    championship_id = request.args.get('championship_id')
+    selected_series_id = request.args.get('selected_series_id')
 
+
+    series_belongs_to_championship = check_series_in_championship(championship_id, selected_series_id)
+
+    return jsonify({'belongs': series_belongs_to_championship})
+
+def check_series_in_championship(championship_id, selected_series_id):
+    selected_series = Series_Model.select_series(selected_series_id)
+    selected_series_champ_id = selected_series.ChampionshipID
+    print('81', selected_series_champ_id, ' ',championship_id)
+    return str(selected_series_champ_id) == str(championship_id)
+
+        # Return True if selected_series_id belongs to championship_id, otherwise False
 def init_routes(app):
     app.register_blueprint(results_bp)

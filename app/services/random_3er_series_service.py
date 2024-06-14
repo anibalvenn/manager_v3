@@ -1,7 +1,7 @@
 import math
 from app.models import Championship_Player_Model, Tische_Model, Series_Model
 
-def create_3er_random_rounds(random_series_amount, current_championship_ID, current_championship_name):
+def create_3er_random_rounds(random_series_amount, current_championship_ID, current_championship_acronym):
     playerIDsArray = get_player_ids_for_championship(current_championship_ID)
     player_groups_with_blinds = split_players_into_groups(playerIDsArray)
     success = True
@@ -13,7 +13,7 @@ def create_3er_random_rounds(random_series_amount, current_championship_ID, curr
         single_3er_serie_tische_array=create_3er_tische_array(player_array_no_blinds=player_array_no_blinds)
 
         
-        series_name = f"{current_championship_name}_{i+1}"
+        series_name = f"{current_championship_acronym}_{i+1}"
         series = Series_Model().insert_series(current_championship_ID, series_name=series_name, 
                                               is_random=True, seek_4er_tische=False)
         if not bau_randomische_tische(i, single_serie_tische_array=single_3er_serie_tische_array, 

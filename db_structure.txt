@@ -47,6 +47,16 @@ Table PlayerTables {
   LostGames integer
   }
 
+  Table SeriesPlayers {
+  SeriesID integer [ref: > Series.SeriesID]
+  PlayerID integer [ref: > Players.PlayerID]
+  WonGames integer
+  LostGames integer
+  TablePoints integer
+  TotalPoints integer
+  PRIMARY KEY (SeriesID, PlayerID, TableID)
+}
+
 // Relationships
 Ref: ChampionshipPlayers.ChampionshipID > Championships.ChampionshipID
 Ref: ChampionshipPlayers.PlayerID > Players.PlayerID

@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
   openModalSelectSeriesID.addEventListener('click', () => {
     openSelectSeriesID()
   });
+  const btnCreateTischeBasedOnTableSeriePlayers = document.getElementById('btnCreateTischeBasedOnTableSeriePlayers');
+  btnCreateTischeBasedOnTableSeriePlayers.addEventListener('click', () => {
+    gatherDataAndSendPostRequest()
+  });
 
   const closeModalSelectSeriesID = document.getElementById('closeModalSelectSeriesID');
   closeModalSelectSeriesID.addEventListener('click', () => {
@@ -31,16 +35,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (selectedSeriesID >= seriesID) {
       alert(`input a series ID lower than ${seriesID}`)
-    }else{
-      // Navigate to the new URL
-      window.location.href = `/edit_serie_tische/${championshipID}/${seriesID}/${selectedSeriesID}`;
-
     }
-
-
-
-
-
+    else {
+      // Check if the selectedSeriesID belongs to the same championship
+      fetch(`/api/check_series?championship_id=${championshipID}&selected_series_id=${selectedSeriesID}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.belongs) {
+            // Navigate to the new URL
+            window.location.href = `/edit_serie_tische/${championshipID}/${seriesID}/${selectedSeriesID}`;
+          } else {
+            alert('Selected series ID does not belong to the same championship.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while checking the series.');
+        });
+    }
   });
 
 
@@ -181,164 +193,62 @@ function applyRowGrouping(tableId) {
   }
 }
 
-function sendDataToServer() {
-  // Get IDs from data attributes
-  const table = document.querySelector('#tableTeamPlayers');
-  const championshipId = table.getAttribute('data-championship-id');
-  const teamId = table.getAttribute('data-team-id');
+function gatherDataAndSendPostRequest() {
+  // Step 1: Loop through all tr elements to gather data-player-id and data-tisch-index
+  const rows = document.querySelectorAll('#tableSeriePlayers tbody tr');
+  const tischData = {};
 
-  // Validate IDs
-  if (!championshipId) {
-    console.error('Championship ID not found.');
-    return;
-  }
-  if (!teamId) {
-    console.error('Team ID not found.');
-    return;
-  }
+  rows.forEach(row => {
+    const playerId = row.getAttribute('data-player-id');
+    const tischIndex = row.getAttribute('data-tisch-index');
 
-  // Determine the team name
-  const spanTeamName = document.getElementById('spanTeamName');
-  const oldTeamName = spanTeamName.getAttribute('data-team-name');
-  const inputTeamName = document.getElementById('inputTeamName');
-  const newTeamName = inputTeamName.value.trim();
-  let teamName = oldTeamName;
-
-  if (newTeamName) {
-    teamName = newTeamName;
-  } else if (!oldTeamName) {
-    alert('Please type in a team name');
-    return;
-  }
-
-  // Prepare data for team name update
-  const dataUpdateTeamName = {
-    teamId: teamId,
-    championshipId: championshipId,
-    teamName: teamName
-  };
-
-  if (teamId != 0 || teamId != '0') {
-
-    updateTeamName(dataUpdateTeamName, oldTeamName, newTeamName)
-  }
-
-  // Collect player IDs to add
-  const players = Array.from(document.querySelectorAll('#tableTeamPlayers tbody tr')).map(row => ({
-    playerId: row.getAttribute('data-player-id')
-  }));
-
-  // Data objects for adding and removing players
-  const dataRemoveTeamPlayers = {
-    championshipId: championshipId,
-    teamId: teamId
-  };
-
-  const dataAddTeamPlayers = {
-    players: players,
-    championshipId: championshipId,
-    teamId: teamId,
-    teamName: teamName
-  };
-
-  // Adding or replacing players based on the teamId value
-  if (teamId === '0') {
-    // Adding players to a new team
-    if (players.length > 0) {
-      addPlayersToTeam(dataAddTeamPlayers)
-    } else {
-      console.log('No players to add.');
+    if (!tischData[tischIndex]) {
+      tischData[tischIndex] = [];
     }
-  } else {
-    removeAllPlayersFromTeam(dataRemoveTeamPlayers)
-      .then(() => {
-        // Check if players are available to add before calling the add function
-        if (dataAddTeamPlayers.players.length > 0) {
-          return addPlayersToTeam(dataAddTeamPlayers);
-        } else {
-          // No players to add, resolve immediately
-          return Promise.resolve();
-        }
-      })
-      .then(() => {
-        console.log('Players updated successfully.');
-        alert('Editions recorded successfully');
-      })
-      .catch(error => {
-        console.error('Error updating players:', error.message);
-      });
-  }
-}
+    tischData[tischIndex].push(playerId);
+  });
 
-// Function to update team name using the provided data
-function updateTeamName(dataUpdateTeamName, oldTeamName, newTeamName) {
-  fetch('/update_team_name', {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(dataUpdateTeamName)
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to update team name.');
-      }
-      return response.json(); // Optional: parse the response if needed
-    })
-    .then(() => {
-      console.log('Team name updated successfully.');
-      alert(`Team name updated successfully from ${oldTeamName} to ${newTeamName}`);
-    })
-    .catch(error => {
-      console.error('Error updating team name:', error.message);
-    });
-}
+  // Step 2: Get data-champioship-id and data-serie-id from the div
+  const modalEditSerie = document.getElementById('modalEditSerie');
+  const championshipId = modalEditSerie.getAttribute('data-champioship-id');
+  const seriesId = modalEditSerie.getAttribute('data-serie-id');
 
+  // Step 3: Get series name from the span
+  const spanSerieName = document.getElementById('spanSerieName');
+  const seriesName = spanSerieName.getAttribute('data-serie-name');
 
+  // Step 4: Gather all data into a JSON object
+  const requestData = {
+    championship_id: championshipId,
+    series_id: seriesId,
+    series_name: seriesName,
+    tisch_data: tischData
+  };
 
-// Function to remove all players from a team
-function removeAllPlayersFromTeam(dataRemoveTeamPlayers) {
-  return fetch('/remove_all_players_from_team', {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(dataRemoveTeamPlayers)
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to remove players from the team.');
-      }
-      return response.json(); // You can use the response if needed
-    });
-}
-// Function to add players to a team
-function addPlayersToTeam(dataAddTeamPlayers) {
-  return fetch('/add_players_to_team', {
+  // Step 5: Send a POST request with the gathered data
+  fetch('/build_edited_tische', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(dataAddTeamPlayers)
+    body: JSON.stringify(requestData)
   })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to add players to the team.');
-      }
-      return response.json(); // Move JSON parsing here to handle based on response status
-    })
-    .then(data => { // Assuming 'data' contains meaningful info about the operation's success
-      if (dataAddTeamPlayers.teamId === '0') {
-        window.location.href = '/teams.html'; // Redirect to the teams page
-      } else {
-        alert("Team insertion successful");
-      }
-    })
-    .catch(error => { // Handle any errors from fetch or from response handling
-      console.error('Error:', error);
-      alert("Error adding team");
-    });
+  .then(response => response.json())
+  .then(data => {
+    console.log('Success:', data);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
 }
+
+// Example: Attach the function to a button click event
+// const btnSendData = document.getElementById('btnSendData');
+// btnSendData.addEventListener('click', gatherDataAndSendPostRequest);
+
+
+
+
 
 
 function openSelectSeriesID() {

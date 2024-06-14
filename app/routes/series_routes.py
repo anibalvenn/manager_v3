@@ -20,15 +20,17 @@ def build_all_random_series():
     players_per_tisch_amount = data.get('playersPerRandomTischAmount')  
     current_campionship_ID = data.get('currentChampionshipID')
     current_championship_name = data.get('currentChampionshipName')
+    current_championship_acronym = data.get('currentChampionshipAcronym')
+
     if players_per_tisch_amount==4 or players_per_tisch_amount=='4':
         create_4er_random_rounds(random_series_amount=random_series_amount,                             
                                  current_championship_ID=current_campionship_ID,                             
-                                 current_championship_name=current_championship_name)
+                                 current_championship_acronym=current_championship_acronym)
         
     if players_per_tisch_amount==3 or players_per_tisch_amount=='3':
         create_3er_random_rounds(random_series_amount=random_series_amount,                             
                                  current_championship_ID=current_campionship_ID,                             
-                                 current_championship_name=current_championship_name)
+                                 current_championship_acronym=current_championship_acronym)
 
     # Create a new series object
 
@@ -46,9 +48,10 @@ def add_ranked_series():
     players_per_ranked_tisch_amount = data.get('playersPerRankedTischAmount')  
     current_campionship_ID = data.get('currentChampionshipID')
     current_championship_name = data.get('currentChampionshipName')
+    current_championship_acronym = data.get('currentChampionshipAcronym')
     seek_4er_tische = players_per_ranked_tisch_amount == 4 or players_per_ranked_tisch_amount == '4'
     for i in range(ranked_series_amount):
-        series_name=current_championship_name+'_'+str(i+1)
+        series_name=current_championship_acronym+'_'+str(i+1)
         Series_Model.insert_series(championship_id=current_campionship_ID,
                                   series_name=series_name,
                                    is_random=False,
