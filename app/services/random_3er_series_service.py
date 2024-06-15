@@ -13,7 +13,9 @@ def create_3er_random_rounds(random_series_amount, current_championship_ID, curr
         single_3er_serie_tische_array=create_3er_tische_array(player_array_no_blinds=player_array_no_blinds)
 
         
-        series_name = f"{current_championship_acronym}_{i+1}"
+        championship_serien = Series_Model.select_series(championship_id=current_championship_ID)
+        length_existing_serien = len(championship_serien)
+        series_name=current_championship_acronym+'_S#'+str(length_existing_serien+1)
         series = Series_Model().insert_series(current_championship_ID, series_name=series_name, 
                                               is_random=True, seek_4er_tische=False)
         if not bau_randomische_tische(i, single_serie_tische_array=single_3er_serie_tische_array, 
@@ -36,7 +38,7 @@ def bau_randomische_tische(series_index, single_serie_tische_array, series):
     for tisch_index, tisch in enumerate(single_serie_tische_array):
         rotated_tisch = tisch[-remainder:] + tisch[:-remainder]
 
-        tisch_name = series.series_name + "_" + str(tisch_index + 1)
+        tisch_name = series.series_name + "_T#" + str(tisch_index + 1)
         # Insert the tisch into the database
         tisch_inserted = Tische_Model().insert_tisch(
             series_id=series.SeriesID, tisch_name=tisch_name,

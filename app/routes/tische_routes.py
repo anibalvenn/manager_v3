@@ -10,11 +10,27 @@ tische_bp = Blueprint('tische_bp', __name__)
 
 @tische_bp.route('/get_serie_tische/<int:serie_id>', methods=['GET'])
 def get_serie_tische(serie_id):
-    tische = Tische_Model.select_tisch(series_id=serie_id)
-    tische_data = [{'tischID': tisch.TischID, 'tischName': tisch.tisch_name,
-                    'posA': tisch.PosA,  'posB': tisch.PosB,
-                    'posC': tisch.PosC,  'posD': tisch.PosD} 
-                    for tisch in tische]
+    tische = Tische_Model.query.filter_by(SeriesID=serie_id).all()
+    
+    tische_data = []
+    for tisch in tische:
+        tisch_info = {
+            'tischID': tisch.TischID,
+            'tischName': tisch.tisch_name,
+            'idPosA': tisch.PosA,
+            'idPosB': tisch.PosB,
+            'idPosC': tisch.PosC,
+            'idPosD': tisch.PosD
+        }
+
+        # Fetch player names if player IDs are valid
+        tisch_info['namePosA'] = Player_Model.query.get(tisch.PosA).name if tisch.PosA and tisch.PosA > 0 else None
+        tisch_info['namePosB'] = Player_Model.query.get(tisch.PosB).name if tisch.PosB and tisch.PosB > 0 else None
+        tisch_info['namePosC'] = Player_Model.query.get(tisch.PosC).name if tisch.PosC and tisch.PosC > 0 else None
+        tisch_info['namePosD'] = Player_Model.query.get(tisch.PosD).name if tisch.PosD and tisch.PosD > 0 else None
+
+        tische_data.append(tisch_info)
+
     return jsonify(tische_data)
 
 @tische_bp.route('/build_edited_tische', methods=['POST'])
@@ -30,7 +46,7 @@ def build_edited_tische():
 
  # Insert tische into the database
         for tisch_index, player_ids in tisch_data.items():
-            tisch_name = f"{series_name}_{tisch_index}"
+            tisch_name = f"{series_name}_T#{tisch_index}"
             pos_a = player_ids[0] if len(player_ids) > 0 else None
             pos_b = player_ids[1] if len(player_ids) > 1 else None
             pos_c = player_ids[2] if len(player_ids) > 2 else None

@@ -34,24 +34,24 @@ document.addEventListener('DOMContentLoaded', function () {
     row.appendChild(idCell);
 
     const posAcell = document.createElement('td');
-    posAcell.textContent = tisch.posA;
+    posAcell.textContent = `${tisch.namePosA}, ${tisch.idPosA}`;
     row.appendChild(posAcell);
     const posBcell = document.createElement('td');
-    posBcell.textContent = tisch.posB;
+    posBcell.textContent = `${tisch.namePosB}, ${tisch.idPosB}`;
     row.appendChild(posBcell);
     const posCcell = document.createElement('td');
-    posCcell.textContent = tisch.posC;
+    posCcell.textContent = `${tisch.namePosC}, ${tisch.idPosC}`
     row.appendChild(posCcell);
     const posDcell = document.createElement('td');
-    posDcell.textContent = tisch.posD;
+    posDcell.textContent = parseInt(tisch.idPosD )> 0 ? `${tisch.namePosD}, ${tisch.idPosD}` : ''
     row.appendChild(posDcell);
 
 
     // Create and append edit button
     const editCell = document.createElement('td');
     const editButton = document.createElement('button');
-    editButton.textContent = 'Sort Players';
-    editButton.className = 'bg-yellow-600 text-white hover:bg-yellow-900 px-3 py-1 rounded-md edit-button';
+    editButton.textContent = 'Insert results';
+    editButton.className = 'bg-green-600 text-white hover:bg-green-900 px-3 py-1 rounded-md edit-button';
     editButton.addEventListener('click', () => {
       // Get the championship data from the row
       const serieRow = editButton.closest('tr');

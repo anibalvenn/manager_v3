@@ -51,7 +51,9 @@ def add_ranked_series():
     current_championship_acronym = data.get('currentChampionshipAcronym')
     seek_4er_tische = players_per_ranked_tisch_amount == 4 or players_per_ranked_tisch_amount == '4'
     for i in range(ranked_series_amount):
-        series_name=current_championship_acronym+'_'+str(i+1)
+        championship_serien = Series_Model.select_series(championship_id=current_campionship_ID)
+        length_existing_serien = len(championship_serien)
+        series_name=current_championship_acronym+'_S#'+str(length_existing_serien+1)
         Series_Model.insert_series(championship_id=current_campionship_ID,
                                   series_name=series_name,
                                    is_random=False,

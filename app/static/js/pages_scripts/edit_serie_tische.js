@@ -236,6 +236,7 @@ function gatherDataAndSendPostRequest() {
   .then(response => response.json())
   .then(data => {
     console.log('Success:', data);
+    alert(`Tische from ${requestData.series_name} were created succesfully`)
   })
   .catch((error) => {
     console.error('Error:', error);
