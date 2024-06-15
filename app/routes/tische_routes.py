@@ -8,6 +8,15 @@ from app.models.tische_model import Tische_Model
 # Create a Blueprint for tische routes
 tische_bp = Blueprint('tische_bp', __name__)
 
+@tische_bp.route('/get_serie_tische/<int:serie_id>', methods=['GET'])
+def get_serie_tische(serie_id):
+    tische = Tische_Model.select_tisch(series_id=serie_id)
+    tische_data = [{'tischID': tisch.TischID, 'tischName': tisch.tisch_name,
+                    'posA': tisch.PosA,  'posB': tisch.PosB,
+                    'posC': tisch.PosC,  'posD': tisch.PosD} 
+                    for tisch in tische]
+    return jsonify(tische_data)
+
 @tische_bp.route('/build_edited_tische', methods=['POST'])
 def build_edited_tische():
     try:

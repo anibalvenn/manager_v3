@@ -9,12 +9,57 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages_scripts/tische.js') }}"></script>
+
 </head>
 
 <body>
   {% include 'navbar.html' %}
   {% include 'change_current_championship.html' %}
+  {% include 'change_current_serie.html' %}
+  <div>
+    <h1 class="text-2xl font-bold text-center p-0 mt-0">Alle Tische</h1>
 
+    <div id="selectTisch">
+      <table id="tischeTable" class="min-w-full divide-y divide-gray-400">
+        <thead class="bg-gray-50">
+
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Tisch Name
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Tisch ID
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Pos A
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Pos B
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Pos C
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Pos D
+            </th>
+           
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Edit
+            </th>
+          
+          </tr>
+
+        </thead>
+        <tbody id="tischeTableBody" class="bg-white divide-y divide-gray-200">
+
+          <!-- Additional tische rows go here -->
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
 
   <!-- Your content for championships page goes here -->
 </body>
