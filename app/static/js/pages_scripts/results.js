@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
   let currentChampionshipID = localStorage.getItem('currentChampionshipID')
-  let currentChampionshipName = localStorage.getItem('currentChampionshipName')
+  let currentChampionshipName = decodeURIComponent(localStorage.getItem('currentChampionshipName'))
 
 
   const serienTableBody = document.getElementById('serienTableBody');

@@ -13,7 +13,12 @@ def update_player_points():
         data = request.get_json()
         player_id = data.get('playerId')
         series_id = data.get('seriesId')
-        points = data.get('points')
+        total_points = data.get('total_points')
+
+        # Optional parameters
+        tisch_points = data.get('tisch_points')
+        won_games = data.get('won_games')
+        lost_games = data.get('lost_games')
 
         # Check if a record with the same series_id and player_id exists
         existing_record = Series_Players_Model.query.filter_by(SeriesID=series_id, PlayerID=player_id).first()
@@ -23,19 +28,30 @@ def update_player_points():
             db.session.delete(existing_record)
             db.session.commit()
 
+        # Prepare the parameters for insertion
+        insert_params = {
+            'series_id': series_id,
+            'player_id': player_id,
+            'total_points': total_points
+        }
+        
+        # Include optional parameters if they exist
+        if tisch_points is not None:
+            insert_params['table_points'] = tisch_points
+        if won_games is not None:
+            insert_params['won_games'] = won_games
+        if lost_games is not None:
+            insert_params['lost_games'] = lost_games
+
         # Insert the new record
-        Series_Players_Model.insert_series_player_record(
-            series_id=series_id,
-            player_id=player_id,
-            total_points=points
-        )
+        Series_Players_Model.insert_series_player_record(**insert_params)
 
         return jsonify(success=True)
 
     except Exception as e:
         db.session.rollback()
         return jsonify(success=False, error=str(e)), 500
-    
+ 
 @results_bp.route('/api/get_series_rank', methods=['GET'])
 def get_series_rank():
     try:

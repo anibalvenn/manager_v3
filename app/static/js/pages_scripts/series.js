@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
   let currentChampionshipID = localStorage.getItem('currentChampionshipID')
-  let currentChampionshipName = localStorage.getItem('currentChampionshipName')
+  let currentChampionshipName = decodeURIComponent(localStorage.getItem('currentChampionshipName'))
   let currentChampionshipAcronym = localStorage.getItem('currentChampionshipAcronym')
 
   document.getElementById('inputCounterSeries').addEventListener('input', function (event) {

@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let currentSerieID = localStorage.getItem('currentSerieID')
   console.log('current serie', currentSerieID)
-  let currentSerieName = localStorage.getItem('currentSerieName')
+  let currentSerieName = decodeURIComponent(localStorage.getItem('currentSerieName'))
 
 
   const tischeTableBody = document.getElementById('tischeTableBody');
@@ -34,17 +34,21 @@ document.addEventListener('DOMContentLoaded', function () {
     row.appendChild(idCell);
 
     const posAcell = document.createElement('td');
-    posAcell.textContent = `${tisch.namePosA}, ${tisch.idPosA}`;
+    posAcell.textContent = `${tisch.namePosA.substring(0, 15)}, ${tisch.idPosA}`;
     row.appendChild(posAcell);
+
     const posBcell = document.createElement('td');
-    posBcell.textContent = `${tisch.namePosB}, ${tisch.idPosB}`;
+    posBcell.textContent = `${tisch.namePosB.substring(0, 15)}, ${tisch.idPosB}`;
     row.appendChild(posBcell);
+
     const posCcell = document.createElement('td');
-    posCcell.textContent = `${tisch.namePosC}, ${tisch.idPosC}`
+    posCcell.textContent = `${tisch.namePosC.substring(0, 15)}, ${tisch.idPosC}`;
     row.appendChild(posCcell);
+
     const posDcell = document.createElement('td');
-    posDcell.textContent = parseInt(tisch.idPosD )> 0 ? `${tisch.namePosD}, ${tisch.idPosD}` : ''
+    posDcell.textContent = parseInt(tisch.idPosD) > 0 ? `${tisch.namePosD.substring(0, 15)}, ${tisch.idPosD}` : '';
     row.appendChild(posDcell);
+
 
 
     // Create and append edit button
@@ -54,11 +58,12 @@ document.addEventListener('DOMContentLoaded', function () {
     editButton.className = 'bg-green-600 text-white hover:bg-green-900 px-3 py-1 rounded-md edit-button';
     editButton.addEventListener('click', () => {
       // Get the championship data from the row
-      const serieRow = editButton.closest('tr');
-      const serieIdInRow = serieRow.getAttribute('data-tisch-id')
+      const tischRow = editButton.closest('tr');
+      const tischId = tischRow.getAttribute('data-tisch-id')
 
-      window.location.href = `/edit_serie_tische/${currentChampionshipID}/${serieIdInRow}`;
-
+      if (tischId) {
+        window.location.href = `edit_tisch_results/${tischId}`;
+      }
     });
     editCell.appendChild(editButton);
     row.appendChild(editCell);
@@ -80,5 +85,33 @@ document.addEventListener('DOMContentLoaded', function () {
       tischeTableBody.appendChild(row);
     });
   }
+
+  function calculateTotalPoints(tischPoints, wonGames, lostGames) {
+    return tischPoints + (wonGames - lostGames) * 50;
+  }
+
+  // Function to update total points for a row
+  function updateTotalPoints(row) {
+    const tischPoints = parseFloat(row.querySelector('input[name="points"]').value) || 0;
+    const wonGames = parseFloat(row.querySelector('input[name="won_games"]').value) || 0;
+    const lostGames = parseFloat(row.querySelector('input[name="lost_games"]').value) || 0;
+    const totalPointsInput = row.querySelector('input[name="total_points"]');
+    
+    const totalPoints = calculateTotalPoints(tischPoints, wonGames, lostGames);
+    console.log(totalPoints)
+    totalPointsInput.value = totalPoints;
+  }
+
+  // Attach event listeners to all relevant inputs
+  const rows = document.querySelectorAll('#tableTischPlayers tbody tr');
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input[name="points"], input[name="won_games"], input[name="lost_games"]');
+    inputs.forEach(input => {
+      input.addEventListener('input', () => updateTotalPoints(row));
+    });
+
+    // Initial calculation for existing values
+    updateTotalPoints(row);
+  });
 
 })

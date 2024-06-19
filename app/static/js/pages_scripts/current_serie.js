@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   let currentChampionshipID = localStorage.getItem('currentChampionshipID');
-  let currentSerieName = localStorage.getItem('currentSerieName');
+  let currentSerieName = decodeURIComponent(localStorage.getItem('currentSerieName'));
   if (currentSerieName) {
     setHeaderCurrentSerieName(currentSerieName)
   }

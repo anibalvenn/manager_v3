@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ playerId: playerId, points: newPoints, seriesId: seriesId })
+                body: JSON.stringify({ playerId: playerId, total_points: newPoints, seriesId: seriesId })
             })
                 .then(response => response.json())
                 .then(data => {

@@ -4,7 +4,8 @@ from app.models.championship_player_model import Championship_Player_Model
 from app.models.player_model import Player_Model
 from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
-from app.services import championship_players_service, series_players_service, team_players_service
+from app.models.tische_model import Tische_Model
+from app.services import championship_players_service, series_players_service, team_players_service,tische_players_service
 
 # routes/view_routes.py
 def init_routes(app):
@@ -98,3 +99,13 @@ def init_routes(app):
                             registered_players=registered_players, 
                             series=series,
                             championship=championship)
+    
+    @app.route('/edit_tisch_results/<int:tisch_id>')
+    def edit_tisch_results(tisch_id):
+        tisch = Tische_Model().select_tisch(tisch_id=tisch_id)
+        serie=Series_Model().select_series(series_id=tisch.SeriesID)
+        tisch_players = tische_players_service.select_tisch_players(tisch=tisch)
+        return render_template('edit_tisch_results.html', 
+                            tisch_players=tisch_players, 
+                            serie=serie,
+                            tisch=tisch)
