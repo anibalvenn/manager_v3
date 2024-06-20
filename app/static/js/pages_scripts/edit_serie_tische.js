@@ -23,6 +23,17 @@ document.addEventListener('DOMContentLoaded', function () {
   closeModalSelectSeriesID.addEventListener('click', () => {
     closeSelectSeriesID()
   });
+  const btnSortSeriesByOverallResults = document.getElementById('btnSortSeriesByOverallResults');
+  btnSortSeriesByOverallResults.addEventListener('click', () => {
+    const selectedSeriesID = 0; // Special identifier for overall results
+    if (isNaN(selectedSeriesID)) {
+      alert('Please enter a valid series ID');
+      return;
+    }
+
+    window.location.href = `/edit_serie_tische/${championshipID}/${seriesID}/${selectedSeriesID}`;
+
+  })
   const btnSubmitSeriesID = document.getElementById('btnSubmitSeriesID');
   btnSubmitSeriesID.addEventListener('click', () => {
 
@@ -233,14 +244,14 @@ function gatherDataAndSendPostRequest() {
     },
     body: JSON.stringify(requestData)
   })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Success:', data);
-    alert(`Tische from ${requestData.series_name} were created succesfully`)
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+      alert(`Tische from ${requestData.series_name} were created succesfully`)
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
 }
 
 // Example: Attach the function to a button click event

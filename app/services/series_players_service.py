@@ -1,6 +1,9 @@
 from app.models import Championship_Player_Model, Player_Model, Championship_Model
 from app import db
+from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
+from sqlalchemy import func, desc
+
 
 def get_players_for_series(championship_id):
     # Query all players with their group information for the given championship
@@ -63,3 +66,16 @@ def get_players_for_simple_series_results(serie_id, championship_id):
         players_data.append(player_data)
 
     return players_data
+
+def get_overall_results(championship_id):
+    # Fetch and aggregate results across all series for the championship
+    overall_results = db.session.query(
+        Player_Model,
+        func.sum(Series_Players_Model.TotalPoints).label('TotalPoints')
+    ).join(Series_Players_Model, Series_Players_Model.PlayerID == Player_Model.PlayerID) \
+    .join(Series_Model, Series_Players_Model.SeriesID == Series_Model.SeriesID) \
+    .filter(Series_Model.ChampionshipID == championship_id) \
+    .group_by(Player_Model.PlayerID) \
+    .order_by(desc('TotalPoints')).all()
+
+    return overall_results
