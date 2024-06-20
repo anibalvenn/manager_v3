@@ -149,19 +149,21 @@ document.addEventListener('DOMContentLoaded', function () {
     row.appendChild(editCell);
 
     // Create and append remove button
-    const removeCell = document.createElement('td');
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'Delete';
-    removeButton.className = 'bg-red-600 text-white hover:bg-red-900 px-3 py-1 rounded-md remove-button';
-    removeButton.addEventListener('click', () => {
-      // Get the championship data from the row
-      const teamRow = editButton.closest('tr');
-      const teamIdInRow = teamRow.getAttribute('data-serie-id')
+    const simpleSeriesResultsCell = document.createElement('td');
+    const simpleSeriesResultsBtn = document.createElement('button');
+    simpleSeriesResultsBtn.textContent = 'Insert Results';
+    simpleSeriesResultsBtn.className = 'bg-green-600 text-white hover:bg-green-900 px-3 py-1 rounded-md';
+    simpleSeriesResultsBtn.addEventListener('click', () => {
+        // Get the championship data from the row
+        const serieRow = simpleSeriesResultsBtn.closest('tr');
+        const serieIdInRow = serieRow.getAttribute('data-serie-id')
+  
+        window.location.href = `/simple_serie_results/${currentChampionshipID}/${serieIdInRow}`;
+  
+      });
 
-      deleteSerie(teamIdInRow)
-    })
-    removeCell.appendChild(removeButton);
-    row.appendChild(removeCell);
+    simpleSeriesResultsCell.appendChild(simpleSeriesResultsBtn);
+    row.appendChild(simpleSeriesResultsCell);
     return row;
 
 
@@ -178,27 +180,5 @@ document.addEventListener('DOMContentLoaded', function () {
       serienTableBody.appendChild(row);
     });
   }
-  function deleteSerie(serieId) {
-    // Send an HTTP DELETE request to the backend to delete the championship
-    fetch(`/delete_serie/${serieId}`, {
-      method: 'DELETE'
-    })
-      .then(response => {
-        if (response.ok) {
-          // Find the row with the matching ID and remove it
-          const rowToRemove = document.querySelector(`tr[data-serie-id="${serieId}"]`);
-          if (rowToRemove) {
-            rowToRemove.remove();
-          } else {
-            throw new Error('Row not found');
-          }
-        } else {
-          throw new Error('Failed to remove serie');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to remove serie');
-      });
-  }
+ 
 })

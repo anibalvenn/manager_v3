@@ -1,0 +1,64 @@
+<!-- championships.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Print</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages_scripts/print.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+
+
+</head>
+
+<body>
+  {% include 'navbar.html' %}
+  {% include 'change_current_championship.html' %}
+  {% include 'change_current_serie.html' %}
+
+  <div class="max-w-7xl mx-auto bg-black">
+ 
+  </div>
+  <div>
+    <h1 class="text-2xl font-bold text-center p-0 mt-0">What do you want to print?</h1>
+    <p class="text-xs text-center p-0 mt-0">In this page, you'll generate the PDFs. To print them, you should go to your local PDF manager tool.</p>
+  </div>
+  <div class="flex justify-between items-center mt-4 py-1">
+    <h1 class="font-bold text-4xl mx-6">Overall Results</h1>
+    <div class="space-x-4 mx-6">
+      <button id="btnPreviewOverallResults" class="bg-gray-700 hover:bg-gray-900 text-white px-4 py-1 rounded-md">Preview Overall Results</button>
+      <button id="btnPrintOverallResults" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Overall Results</button>
+    </div>
+  </div>
+  <div class="flex justify-between items-center mt-4 py-1">
+    <h1 class="font-bold text-4xl mx-6">Current Series Results</h1>
+    <div class="space-x-4 mx-6">
+      <button id="btnPreviewCurrentSeriesResults" class="bg-gray-700 hover:bg-gray-900 text-white px-4 py-1 rounded-md">Preview Current Series Results</button>
+      <button id="btnPrintCurrentSeriesResults" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Current Series Results</button>
+    </div>
+  </div>
+  <div class="flex justify-between items-center mt-4 py-1">
+    <h1 class="font-bold text-4xl mx-6">Current Series Listen</h1>
+    <div class="space-x-4 mx-6">
+      <button id="btnPrintCurrentSeriesListen" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Current Series Listen</button>
+    </div>
+  </div>
+  <div class="flex justify-between items-center mt-4 py-1">
+    <div>
+
+      <h1 class="font-bold text-4xl mx-6">Player Zettel</h1>
+      <p class="text-xs mx-6">Individual player note with respective tables and  seats</p>
+    </div>
+    <div class="space-x-4 mx-6">
+      <button id="btnPrintPlayerZettel" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 ro  unded-md">Print Player Zettel</button>
+    </div>
+  </div>
+  <!-- Your content for championships page goes here -->
+</body>
+
+</html>

@@ -34,9 +34,9 @@ def init_routes(app):
     def teams():
         return render_template('teams.html')
 
-    @app.route('/results.html')
-    def results():
-        return render_template('results.html')
+    @app.route('/print.html')
+    def print():
+        return render_template('print.html')
         
     @app.route('/championship_players/<int:championship_id>')
     def show_championship_players(championship_id):
