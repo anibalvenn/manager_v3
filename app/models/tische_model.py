@@ -51,10 +51,10 @@ class Tische_Model(db.Model):
 
     @classmethod
     def select_tisch(cls, tisch_id=None, series_id=None):
-        """Selects tische based on tisch ID or series ID."""
+        """Selects tische based on tisch ID or series ID, sorted by TischID."""
         query = cls.query
         if tisch_id:
             return query.get(tisch_id)
         if series_id:
-            return query.filter_by(SeriesID=series_id).all()
-        return query.all()  # Return all tische if no specific filter is provided
+            return query.filter_by(SeriesID=series_id).order_by(cls.TischID).all()
+        return query.order_by(cls.TischID).all()  # Return all tische sorted by TischID if no specific filter is provided

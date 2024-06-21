@@ -27,6 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
     generatePDFOverallResults()
   });
 
+  const btnPrintCurrentSeriesListen = document.getElementById('btnPrintCurrentSeriesListen');
+  btnPrintCurrentSeriesListen.addEventListener('click', () => {
+    // Get the championship data from the row
+    generateCurrentSeriesPdfListen(currentSerieID)
+  });
+
   async function generatePDFSeriesResult() {
     if (!currentSerieID) {
       alert("Please select a series to get results");
@@ -366,5 +372,135 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  async function generateCurrentSeriesPdfListen(currentSerieID) {
+    if (!currentSerieID) {
+      alert("No series ID found in local storage");
+      return;
+    }
 
+    try {
+      const response = await fetch(`/get_serie_tische/${currentSerieID}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+
+      const tische = await response.json();
+
+      const { PDFDocument } = PDFLib;
+      const mergedPdf = await PDFDocument.create();
+
+      for (const tisch of tische) {
+        const positions = [
+          { pos: 'PosA', name: tisch.namePosA, id: tisch.idPosA },
+          { pos: 'PosB', name: tisch.namePosB, id: tisch.idPosB },
+          { pos: 'PosC', name: tisch.namePosC, id: tisch.idPosC },
+          { pos: 'PosD', name: tisch.namePosD, id: tisch.idPosD }
+        ];
+
+        const validPositions = positions.filter(position => position.id > 0);
+        const numPlayers = validPositions.length;
+
+        let templatePath;
+        if (numPlayers === 4) {
+          templatePath = '/static/pdf_templates/4er_Liste_BR.pdf';
+        } else if (numPlayers === 3) {
+          templatePath = '/static/pdf_templates/3er_Liste_BR.pdf';
+        } else {
+          continue; // Skip if the number of players is not 3 or 4
+        }
+
+        const existingPdfBytes = await fetch(templatePath).then(res => res.arrayBuffer());
+        const existingPdf = await PDFDocument.load(existingPdfBytes);
+        const [templatePage] = await mergedPdf.copyPages(existingPdf, [0]);
+        mergedPdf.addPage(templatePage);
+
+        const page = mergedPdf.getPage(mergedPdf.getPageCount() - 1);
+        const tischName =tisch.tischName
+        const labels = extractLabels(tischName);
+        const tischLabel = labels.tischLabel
+        const seriesLabel = labels.seriesLabel
+        const todayDate= getCurrentDateFormatted()
+        if(numPlayers==4){  
+          page.drawText(`${todayDate}`, { x: 110, y: 760, size: 12 });
+          page.drawText(`${tischLabel}`, { x: 535, y: 760, size: 20 });
+          page.drawText(`${seriesLabel}`, { x: 455, y: 760, size: 20 });
+          // Customize the template page with the tisch and player data
+          page.drawText(`${tisch.tischName}`, { x: 200, y: 760, size: 12 });
+          page.drawText(`, T_ID: ${tisch.tischID}`, { x: 320, y: 760, size: 6 });
+          page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 261, y: 738, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 341, y: 738, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 421, y: 738, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosD,15)}`, { x: 501, y: 738, size: 8 });
+          page.drawText(`${tisch.idPosA}`, { x: 300, y: 717, size: 14 });
+          page.drawText(`${tisch.idPosB}`, { x: 380, y: 717, size: 14 });
+          page.drawText(`${tisch.idPosC}`, { x: 460, y: 717, size: 14 });
+          page.drawText(`${tisch.idPosD}`, { x: 540, y: 717, size: 14 });
+  
+         
+        }
+        if(numPlayers==3){  
+          page.drawText(`${todayDate}`, { x: 110, y: 760, size: 12 });
+          page.drawText(`${tischLabel}`, { x: 520, y: 760, size: 20 });
+          page.drawText(`${seriesLabel}`, { x: 430, y: 760, size: 20 });
+          // Customize the template page with the tisch and player data
+          page.drawText(`${tisch.tischName}`, { x: 200, y: 760, size: 12 });
+          page.drawText(`, T_ID: ${tisch.tischID}`, { x: 320, y: 760, size: 6 });
+          page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 301, y: 738, size: 10 });
+          page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 391, y: 738, size: 10 });
+          page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 481, y: 738, size: 10 });
+          page.drawText(`${tisch.idPosA}`, { x: 360, y: 712, size: 16 });
+          page.drawText(`${tisch.idPosB}`, { x: 450, y: 712, size: 16 });
+          page.drawText(`${tisch.idPosC}`, { x: 540, y: 712, size: 16 });
+  
+        
+        }
+    
+
+   
+      }
+
+      const pdfBytes = await mergedPdf.save();
+
+      // Trigger download of the PDF
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Series_${currentSerieID}_Tisch_Listen.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF');
+    }
+  }
+
+  function extractLabels(tableName) {
+    const seriesMatch = tableName.match(/_S#(\d+)/);
+    const tischMatch = tableName.match(/_T#(\d+)/);
+
+    const seriesLabel = seriesMatch ? seriesMatch[1] : null;
+    const tischLabel = tischMatch ? tischMatch[1] : null;
+
+    return {
+      seriesLabel,
+      tischLabel
+    };
+  }
+
+  function getCurrentDateFormatted() {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const year = today.getFullYear();
+  
+    return `${day}-${month}-${year}`;
+  }
+  function truncateString(str, maxLength) {
+    if (str.length > maxLength) {
+      return str.slice(0, maxLength);
+    }
+    return str;
+  }
 })
