@@ -3,16 +3,20 @@ from app.models import Championship_Player_Model, Tische_Model, Series_Model
 
 def create_4er_random_rounds(random_series_amount, current_championship_ID, current_championship_acronym):
     playerIDsArray = get_player_ids_for_championship(current_championship_ID)
-    player_groups_with_blinds = split_players_into_groups(playerIDsArray)
+
+    player_ids_groups_with_blinds = split_players_into_groups(playerIDsArray)
     success = True
     
-    for i in range(random_series_amount):
-        player_groups_to_rounds = rotate_groups(player_groups_with_blinds)
+    for i in range(int(random_series_amount)):
+        # Use the result of rotate_groups from the previous iteration as input for the next
+        player_ids_groups_with_blinds = rotate_groups(player_ids_groups_with_blinds)
+        player_groups_to_rounds = player_ids_groups_with_blinds
+        
         single_serie_tische_array = generate_one_serie_tische_array(player_groups_to_rounds)
         
         championship_serien = Series_Model.select_series(championship_id=current_championship_ID)
         length_existing_serien = len(championship_serien)
-        series_name=current_championship_acronym+'_S#'+str(length_existing_serien+1)
+        series_name = current_championship_acronym + '_S#' + str(length_existing_serien + 1)
         series = Series_Model().insert_series(current_championship_ID, series_name=series_name, 
                                               is_random=True, seek_4er_tische=True)
         if not bau_randomische_tische(i, single_serie_tische_array=single_serie_tische_array, 
@@ -22,8 +26,7 @@ def create_4er_random_rounds(random_series_amount, current_championship_ID, curr
             success = False
     
     return success
-
-      
+     
 def generate_one_serie_tische_array(groups):
     # The zip function combines elements from each group with the same index
     return [list(group) for group in zip(*groups)]
@@ -58,14 +61,14 @@ def get_player_ids_for_championship(championship_id):
     registered_player_ids = [player.PlayerID for player in registered_players_from_selection]
     return registered_player_ids
 
-def rotate_groups(self, groups):
+def rotate_groups(groups):
       # Apply the rotation logic to each group with its index
     return [rotate_group_with_fixed_blind(group, index) for index, group in enumerate(groups)]
   
 def rotate_group_with_fixed_blind( group, index):
     # """Rotates the group while keeping the position of a player with playerID == -1 fixed."""
     # Find the index of the player with playerID == -1
-    blind_player_index = next((i for i, player in enumerate(group) if player.playerID == -1), None)
+    blind_player_index = next((i for i in enumerate(group) if i == -1), None)
 
     if blind_player_index is not None:
         # Temporarily remove the player with playerID == -1
@@ -84,8 +87,8 @@ def rotate_group_with_fixed_blind( group, index):
     return group
 
 
-def split_players_into_groups(players_arr):
-    num_players = len(players_arr)
+def split_players_into_groups(players_ids_arr):
+    num_players = len(players_ids_arr)
     num_groups = 4
     group_size = math.ceil(num_players / num_groups)
     remainder = num_players % num_groups
@@ -100,14 +103,15 @@ def split_players_into_groups(players_arr):
     current_index = 0
 
     # Fill the first group with 'group_size' players
-    player_groups[0] = players_arr[current_index:current_index + group_size]
+    player_groups[0] = players_ids_arr[current_index:current_index + group_size]
     current_index += group_size
 
     # For the remaining groups
     for i in range(1, num_groups):
         size = group_size - 1 if i >= num_groups - num_blind_players else group_size
-        player_groups[i] = players_arr[current_index:current_index + size]
+        player_groups[i] = players_ids_arr[current_index:current_index + size]
         current_index += size
+    
 
     # Print group sizes and compositions for verification
     for i in range(1, num_blind_players + 1):
@@ -117,8 +121,7 @@ def split_players_into_groups(players_arr):
         insert_position = len(player_groups[-i]) - i+1  # Calculate the correct insert position
       blind_player = -1
       player_groups[-i].insert(insert_position, blind_player)
-    for i, group in enumerate(player_groups):
-      player_ids = [player.playerID for player in group]
-      print(f"Group {i+1}: {player_ids}, Size: {len(group)}")
+    return player_groups
+
 
 

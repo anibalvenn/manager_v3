@@ -23,6 +23,10 @@ document.addEventListener('DOMContentLoaded', function () {
   closeModalSelectSeriesID.addEventListener('click', () => {
     closeSelectSeriesID()
   });
+  const btnShufflePlayersSerieTische = document.getElementById('btnShufflePlayersSerieTische');
+  btnShufflePlayersSerieTische.addEventListener('click', () => {
+    shuffleTablePlayers()
+  });
   const btnSortSeriesByOverallResults = document.getElementById('btnSortSeriesByOverallResults');
   btnSortSeriesByOverallResults.addEventListener('click', () => {
     const selectedSeriesID = 0; // Special identifier for overall results
@@ -66,6 +70,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  const movePlayerOutButtons = document.querySelectorAll('.btnMovePlayerOut');
+
+  // Add event listener to each button
+  movePlayerOutButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Get the parent row (tr) of the clicked button
+      const playerRow = button.closest('tr');
+
+      // Get the data-player-id attribute of the row
+      const playerId = playerRow.getAttribute('data-player-id');
+
+      // Remove the row from the DOM
+      playerRow.remove();
+
+      // Invoke the applyRowGrouping method
+      applyRowGrouping('tableSeriePlayers');
+
+      console.log(`Player with ID ${playerId} removed`);
+    });
+  });
 
   // const btnSendDataToServer = document.getElementById("btnSaveChangesModalEditTeams")
   // btnSendDataToServer.addEventListener('click', () => {
@@ -204,7 +228,7 @@ function applyRowGrouping(tableId) {
   }
 }
 
-function gatherDataAndSendPostRequest() {
+async function gatherDataAndSendPostRequest() {
   // Step 1: Loop through all tr elements to gather data-player-id and data-tisch-index
   const rows = document.querySelectorAll('#tableSeriePlayers tbody tr');
   const tischData = {};
@@ -219,16 +243,39 @@ function gatherDataAndSendPostRequest() {
     tischData[tischIndex].push(playerId);
   });
 
-  // Step 2: Get data-champioship-id and data-serie-id from the div
+  // Step 2: Get data-championship-id and data-serie-id from the div
   const modalEditSerie = document.getElementById('modalEditSerie');
-  const championshipId = modalEditSerie.getAttribute('data-champioship-id');
+  const championshipId = modalEditSerie.getAttribute('data-championship-id');
   const seriesId = modalEditSerie.getAttribute('data-serie-id');
 
   // Step 3: Get series name from the span
   const spanSerieName = document.getElementById('spanSerieName');
   const seriesName = spanSerieName.getAttribute('data-serie-name');
 
-  // Step 4: Gather all data into a JSON object
+  // Step 4: Check if there are existing records with TotalPoints > 0
+  const checkResponse = await fetch(`/check_series_player_records?series_id=${seriesId}`);
+  const checkData = await checkResponse.json();
+
+  if (checkData.exists) {
+    alert('Couldn\'t create tables because there are already results assigned to players in this series');
+    return;
+  }
+
+  // Step 5: Check if there are existing tische for the series
+  const tischeResponse = await fetch(`/check_existing_tische?series_id=${seriesId}`);
+  const tischeData = await tischeResponse.json();
+
+  if (tischeData.exists) {
+    const deleteResponse = await fetch(`/delete_existing_tische?series_id=${seriesId}`, { method: 'DELETE' });
+    const deleteData = await deleteResponse.json();
+
+    if (!deleteData.success) {
+      alert('Failed to delete existing tische');
+      return;
+    }
+  }
+
+  // Step 6: Gather all data into a JSON object
   const requestData = {
     championship_id: championshipId,
     series_id: seriesId,
@@ -236,7 +283,7 @@ function gatherDataAndSendPostRequest() {
     tisch_data: tischData
   };
 
-  // Step 5: Send a POST request with the gathered data
+  // Step 7: Send a POST request with the gathered data
   fetch('/build_edited_tische', {
     method: 'POST',
     headers: {
@@ -247,12 +294,13 @@ function gatherDataAndSendPostRequest() {
     .then(response => response.json())
     .then(data => {
       console.log('Success:', data);
-      alert(`Tische from ${requestData.series_name} were created succesfully`)
+      alert(`Tische from ${requestData.series_name} were created successfully`);
     })
     .catch((error) => {
       console.error('Error:', error);
     });
 }
+
 
 // Example: Attach the function to a button click event
 // const btnSendData = document.getElementById('btnSendData');
@@ -276,3 +324,21 @@ function closeSelectSeriesID() {
 
 }
 
+function shuffleTablePlayers() {
+  const table = document.getElementById('tableSeriePlayers');
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+
+  // Shuffle the rows array
+  for (let i = rows.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rows[i], rows[j]] = [rows[j], rows[i]];
+  }
+
+  // Clear the tbody
+  tbody.innerHTML = '';
+
+  // Append the shuffled rows
+  rows.forEach(row => tbody.appendChild(row));
+  applyRowGrouping('tableSeriePlayers')
+}

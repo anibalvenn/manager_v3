@@ -166,3 +166,20 @@ def get_championship_rank():
 
     except Exception as e:
         return jsonify(success=False, error=str(e)), 500
+    
+@results_bp.route('/check_series_player_records', methods=['GET'])
+def check_series_player_records():
+    try:
+        series_id = request.args.get('series_id')
+
+        if not series_id:
+            return jsonify(success=False, error="series_id is required"), 400
+
+        existing_records = Series_Players_Model.select_series_player_records(series_id=series_id, min_total_points=1)
+
+        if existing_records:
+            return jsonify(success=True, exists=True)
+        else:
+            return jsonify(success=True, exists=False)
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500

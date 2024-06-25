@@ -61,6 +61,44 @@ def build_edited_tische():
 
    
 
-        # Return True if selected_series_id belongs to championship_id, otherwise False
+@tische_bp.route('/check_existing_tische', methods=['GET'])
+def check_existing_tische():
+    try:
+        series_id = request.args.get('series_id')
+
+        if not series_id:
+            return jsonify(success=False, error="series_id is required"), 400
+
+        existing_tische = Tische_Model.select_tisch(series_id=series_id)
+
+        if existing_tische:
+            return jsonify(success=True, exists=True)
+        else:
+            return jsonify(success=True, exists=False)
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+
+
+@tische_bp.route('/delete_existing_tische', methods=['DELETE'])
+def delete_existing_tische():
+    try:
+        series_id = request.args.get('series_id')
+
+        if not series_id:
+            return jsonify(success=False, error="series_id is required"), 400
+
+        existing_tische = Tische_Model.select_tisch(series_id=series_id)
+
+        if existing_tische:
+            for tisch in existing_tische:
+                Tische_Model.delete_tisch(tisch.TischID)
+            return jsonify(success=True)
+        else:
+            return jsonify(success=False, error="No tische found to delete"), 404
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+
+
 def init_routes(app):
     app.register_blueprint(tische_bp)
+

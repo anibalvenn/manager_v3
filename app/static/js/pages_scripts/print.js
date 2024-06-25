@@ -445,13 +445,39 @@ document.addEventListener('DOMContentLoaded', function () {
           // Customize the template page with the tisch and player data
           page.drawText(`${tisch.tischName}`, { x: 200, y: 760, size: 12 });
           page.drawText(`, T_ID: ${tisch.tischID}`, { x: 320, y: 760, size: 6 });
-          page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 301, y: 738, size: 10 });
-          page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 391, y: 738, size: 10 });
-          page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 481, y: 738, size: 10 });
-          page.drawText(`${tisch.idPosA}`, { x: 360, y: 712, size: 16 });
-          page.drawText(`${tisch.idPosB}`, { x: 450, y: 712, size: 16 });
-          page.drawText(`${tisch.idPosC}`, { x: 540, y: 712, size: 16 });
-  
+          if(tisch.idPosA==-1){
+            page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 301, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 391, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD,15)}`, { x: 481, y: 738, size: 10 });
+            page.drawText(`${tisch.idPosB}`, { x: 360, y: 712, size: 16 });
+            page.drawText(`${tisch.idPosC}`, { x: 450, y: 712, size: 16 });
+            page.drawText(`${tisch.idPosD}`, { x: 540, y: 712, size: 16 });
+          }
+          if(tisch.idPosB==-1){
+            page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 301, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 391, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD,15)}`, { x: 481, y: 738, size: 10 });
+            page.drawText(`${tisch.idPosA}`, { x: 360, y: 712, size: 16 });
+            page.drawText(`${tisch.idPosC}`, { x: 450, y: 712, size: 16 });
+            page.drawText(`${tisch.idPosD}`, { x: 540, y: 712, size: 16 });
+          }
+          if(tisch.idPosC==-1){
+            page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 301, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 391, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD,15)}`, { x: 481, y: 738, size: 10 });
+            page.drawText(`${tisch.idPosA}`, { x: 360, y: 712, size: 16 });
+            page.drawText(`${tisch.idPosB}`, { x: 450, y: 712, size: 16 });
+            page.drawText(`${tisch.idPosD}`, { x: 540, y: 712, size: 16 });
+          }
+          if(tisch.idPosD==-1){
+            page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 301, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 391, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 481, y: 738, size: 10 });
+            page.drawText(`${tisch.idPosA}`, { x: 360, y: 712, size: 16 });
+            page.drawText(`${tisch.idPosB}`, { x: 450, y: 712, size: 16 });
+            page.drawText(`${tisch.idPosC}`, { x: 540, y: 712, size: 16 });
+          }
+          
         
         }
     

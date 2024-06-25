@@ -34,15 +34,15 @@ document.addEventListener('DOMContentLoaded', function () {
     row.appendChild(idCell);
 
     const posAcell = document.createElement('td');
-    posAcell.textContent = `${tisch.namePosA.substring(0, 15)}, ${tisch.idPosA}`;
+    posAcell.textContent = parseInt(tisch.idPosA) > 0 ? `${tisch.namePosA.substring(0, 15)}, ${tisch.idPosA}` : '';
     row.appendChild(posAcell);
 
     const posBcell = document.createElement('td');
-    posBcell.textContent = `${tisch.namePosB.substring(0, 15)}, ${tisch.idPosB}`;
+    posBcell.textContent = parseInt(tisch.idPosB) > 0 ? `${tisch.namePosB.substring(0, 15)}, ${tisch.idPosB}` : '';
     row.appendChild(posBcell);
 
     const posCcell = document.createElement('td');
-    posCcell.textContent = `${tisch.namePosC.substring(0, 15)}, ${tisch.idPosC}`;
+    posCcell.textContent = parseInt(tisch.idPosC) > 0 ? `${tisch.namePosC.substring(0, 15)}, ${tisch.idPosC}` : '';
     row.appendChild(posCcell);
 
     const posDcell = document.createElement('td');
@@ -86,32 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function calculateTotalPoints(tischPoints, wonGames, lostGames) {
-    return tischPoints + (wonGames - lostGames) * 50;
-  }
-
-  // Function to update total points for a row
-  function updateTotalPoints(row) {
-    const tischPoints = parseFloat(row.querySelector('input[name="points"]').value) || 0;
-    const wonGames = parseFloat(row.querySelector('input[name="won_games"]').value) || 0;
-    const lostGames = parseFloat(row.querySelector('input[name="lost_games"]').value) || 0;
-    const totalPointsInput = row.querySelector('input[name="total_points"]');
-    
-    const totalPoints = calculateTotalPoints(tischPoints, wonGames, lostGames);
-    console.log(totalPoints)
-    totalPointsInput.value = totalPoints;
-  }
-
-  // Attach event listeners to all relevant inputs
-  const rows = document.querySelectorAll('#tableTischPlayers tbody tr');
-  rows.forEach(row => {
-    const inputs = row.querySelectorAll('input[name="points"], input[name="won_games"], input[name="lost_games"]');
-    inputs.forEach(input => {
-      input.addEventListener('input', () => updateTotalPoints(row));
-    });
-
-    // Initial calculation for existing values
-    updateTotalPoints(row);
-  });
+ 
 
 })
