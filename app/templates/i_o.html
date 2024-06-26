@@ -1,0 +1,64 @@
+<!-- championships.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import/Export</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages_scripts/i_o.js') }}"></script>
+
+
+</head>
+
+<body>
+  {% include 'navbar.html' %}
+  {% include 'change_current_championship.html' %}
+  {% include 'change_current_serie.html' %}
+
+
+  <div class="max-w-7xl mx-auto bg-black">
+ 
+  </div>
+  <div>
+    <h1 class="text-2xl font-bold text-center p-0 mt-0">What do you want to import?</h1>
+    <!-- <p class="text-xs text-center p-0 mt-0">In this page, you'll generate the PDFs. To print them, you should go to your local PDF manager tool.</p> -->
+  </div>
+  <table class="mt-4 w-full border-b border-gray-200 text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-4 py-2 text-left">Subject</th>
+        <th class="px-4 py-2 text-left">Import</th>
+        <th class="px-4 py-2 text-left">Export</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <h1 class="font-bold text-2xl mx-6">Series Results</h1>
+        </td>
+        <td>
+          <button id="btnImportSeriesResults" class="bg-blue-700 hover:bg-blue-900 text-white px-4 py-1 rounded-md">Import Series Results</button>
+          <input type="file" id="fileInputSeriesResults" class="hidden" accept=".csv">
+        </td>
+        <td>
+          <button id="btnExportSeriesResults" class="bg-gray-100 hover:bg-gray-200 text-blue-700 px-4 py-1 rounded-md">Export Series Results</button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h1 class="font-bold text-2xl mx-6">Overall Results</h1>
+        </td>
+        <td>
+          <button id="btnImportOverallResults" class="bg-blue-700 hover:bg-blue-900 text-white px-4 py-1 rounded-md">Import Overall Results</button>
+          <input type="file" id="fileInputOverallResults" class="hidden" accept=".csv">
+        </td>
+        <td>
+          <button id="btnExportOverallResults" class="bg-gray-100 hover:bg-gray-200 text-blue-700 px-4 py-1 rounded-md">Export Overall Results</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>

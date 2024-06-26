@@ -1,5 +1,7 @@
+import datetime
 from flask import Blueprint, request, jsonify, send_file
 from app import db
+from app.models.championship_model import Championship_Model
 from app.models.player_model import Player_Model
 from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
@@ -99,9 +101,6 @@ def check_series_in_championship(championship_id, selected_series_id):
     print('81', selected_series_champ_id, ' ',championship_id)
     return str(selected_series_champ_id) == str(championship_id)
 
-        # Return True if selected_series_id belongs to championship_id, otherwise False
-def init_routes(app):
-    app.register_blueprint(results_bp)
 
 
 
@@ -183,3 +182,70 @@ def check_series_player_records():
             return jsonify(success=True, exists=False)
     except Exception as e:
         return jsonify(success=False, error=str(e)), 500
+    
+@results_bp.route('/api/import_series_results', methods=['POST'])
+def import_series_results():
+    try:
+        data = request.json
+        championship_id = data.get('championship_id')
+        players_data = data.get('data')
+
+        if not championship_id or not players_data:
+            return jsonify(success=False, error="Invalid data"), 400
+
+        # Loop through each series and insert data
+        series_points = {player['player_id']: player['series_points'] for player in players_data}
+        
+        for i, series in enumerate(players_data[0]['series_points']):
+            championship_serien = Series_Model.select_series(championship_id=championship_id)
+            length_existing_serien = len(championship_serien)
+            current_championship = Championship_Model.select_championship(championship_id=championship_id)
+            current_championship_acronym = current_championship.acronym
+            print(current_championship_acronym, length_existing_serien)
+            series_name = current_championship_acronym + '_S#' + str(length_existing_serien + 1)
+            new_series = Series_Model.insert_series(championship_id, series_name)
+
+            for player in players_data:
+                series_points = next((sp['points'] for sp in player['series_points'] if sp['series'] == series_name), None)
+                if series_points is not None:
+                    Series_Players_Model.insert_series_player_record(new_series.SeriesID, player['player_id'], total_points=series_points)
+
+        return jsonify(success=True)
+
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+
+
+@results_bp.route('/api/import_single_series_results', methods=['POST'])
+def import_single_series_results():
+    try:
+        data = request.json
+        championship_id = data.get('championship_id')
+        players_data = data.get('data')
+
+        if not championship_id or not players_data:
+            return jsonify(success=False, error="Invalid data"), 400
+
+        # Create a new series for the championship
+        championship_serien = Series_Model.select_series(championship_id=championship_id)
+        length_existing_serien = len(championship_serien)
+        current_championship = Championship_Model.select_championship(championship_id=championship_id)
+        current_championship_acronym = current_championship.acronym
+        series_name = current_championship_acronym + '_S#' + str(length_existing_serien + 1)        
+        new_series = Series_Model.insert_series(championship_id, series_name)
+
+        # Insert player records for the new series
+        for player in players_data:
+            Series_Players_Model.insert_series_player_record(
+                new_series.SeriesID,
+                player['player_id'],
+                total_points=player['total_points']
+            )
+
+        return jsonify(success=True)
+
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+
+def init_routes(app):
+    app.register_blueprint(results_bp)

@@ -37,6 +37,9 @@ def init_routes(app):
     @app.route('/print.html')
     def print():
         return render_template('print.html')
+    @app.route('/i_o.html')
+    def i_o():
+        return render_template('i_o.html')
         
     @app.route('/championship_players/<int:championship_id>')
     def show_championship_players(championship_id):
@@ -63,9 +66,9 @@ def init_routes(app):
     def show_series_players(championship_id, serie_id, rank_series_id):
         championship = Championship_Model().select_championship(championship_id=championship_id)
         series = Series_Model().select_series(series_id=serie_id)
-        
+
         registered_players = []
-        
+
         if rank_series_id is not None:
             if rank_series_id == 0:
                 # Fetch the players ordered by overall total points across all series
@@ -104,8 +107,27 @@ def init_routes(app):
                             'player_group': player_group
                         })
         else:
-            # Fetch the players for the championship
-            registered_players = series_players_service.get_players_for_series(championship_id)
+            # Fetch the tische for the series
+            tische = Tische_Model.query.filter_by(SeriesID=serie_id).all()
+            if tische:
+                for tisch in tische:
+                    positions = ['PosA', 'PosB', 'PosC', 'PosD']
+                    for pos in positions:
+                        player_id = getattr(tisch, pos)
+                        if player_id and player_id > 0:
+                            player_info = Player_Model.query.filter_by(PlayerID=player_id).first()
+                            if player_info:
+                                player_group_info = Championship_Player_Model.select_championship_player(player_id=player_id, championship_id=championship_id)
+                                player_group = player_group_info.player_group if player_group_info else None
+                                registered_players.append({
+                                    'name': player_info.name,
+                                    'PlayerID': player_id,
+                                    'TotalPoints': 0,  # or whatever value you need for the TotalPoints field
+                                    'player_group': player_group
+                                })
+            else:
+                # Fetch the players for the championship
+                registered_players = series_players_service.get_players_for_series(championship_id)
 
         return render_template('edit_serie_tische.html', 
                                 registered_players=registered_players, 
