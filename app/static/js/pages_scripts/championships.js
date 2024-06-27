@@ -129,25 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
     editCell.appendChild(editButton);
     row.appendChild(editCell);
 
-    // Create and append remove button
-    const removeCell = document.createElement('td');
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'Delete';
-    removeButton.className = 'bg-red-600 text-white hover:bg-red-900 px-3 py-1 rounded-md remove-button';
-    removeButton.addEventListener('click', () => {
-      const spanRemoveChampionship = document.getElementById('spanRemoveChampionship');
-      spanRemoveChampionship.textContent = championship.name;
-
-      const modalRemoveChampionship = document.getElementById('modalRemoveChampionship');
-      modalRemoveChampionship.setAttribute('data-championship-id', championship.championshipID);
-
-      // Add event listener to the "Delete" button
-      btnRemoveChampionship.addEventListener('click', handleDeleteChampionship);
-
-      showRemoveModal();
-    });
-    removeCell.appendChild(removeButton);
-    row.appendChild(removeCell);
 
     // Create and append players cell
     const playersCell = document.createElement('td');

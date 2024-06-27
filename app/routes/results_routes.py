@@ -8,6 +8,9 @@ from app.models.series_player_model import Series_Players_Model
 import csv
 from io import StringIO
 
+from app.models.team_members_model import Team_Members_Model
+from app.models.teams_model import Teams_Model
+
 # Create a Blueprint for series routes
 results_bp = Blueprint('results_bp', __name__)
 
@@ -244,6 +247,76 @@ def import_single_series_results():
             )
 
         return jsonify(success=True)
+
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+
+
+@results_bp.route('/api/get_teams_results', methods=['POST'])
+def get_teams_results():
+    try:
+        data = request.json
+        championship_id = data.get('championship_id')
+        series_id = data.get('series_id', None)  # Get series_id if provided
+
+        if not championship_id:
+            return jsonify(success=False, error="Championship ID is required"), 400
+
+        # Step 2: Get teams enrolled in the championship
+        teams = Teams_Model.select_team(championship_id=championship_id)
+
+        if not teams:
+            return jsonify(success=False, error="No teams found for this championship"), 404
+
+        team_results = []
+
+        for team in teams:
+            team_info = {
+                'team_id': team.TeamID,
+                'team_name': team.team_name,
+                'players': []
+            }
+
+            # Step 2: Get players belonging to the team
+            team_members = Team_Members_Model.select_team_members(team_id=team.TeamID)
+
+            for member in team_members:
+                player_info = {
+                    'player_id': member.PlayerID,
+                    'series_points': []
+                }
+
+                if series_id:
+                    # Get player records for the specific series
+                    series = Series_Model.select_series(series_id=series_id, championship_id=championship_id, is_random=True)
+                    if series:
+                        player_records = Series_Players_Model.select_series_player_records(series_id=series.SeriesID, player_id=member.PlayerID)
+                        for record in player_records:
+                            player_info['series_points'].append({
+                                'series_id': series.SeriesID,
+                                'series_name': series.series_name,
+                                'total_points': record.TotalPoints
+                            })
+                else:
+                    # Get series for the championship that are played randomly
+                    series_list = Series_Model.select_series(championship_id=championship_id, is_random=True)
+
+                    for series in series_list:
+                        # Get player records for each series
+                        player_records = Series_Players_Model.select_series_player_records(series_id=series.SeriesID, player_id=member.PlayerID)
+
+                        for record in player_records:
+                            player_info['series_points'].append({
+                                'series_id': series.SeriesID,
+                                'series_name': series.series_name,
+                                'total_points': record.TotalPoints
+                            })
+
+                team_info['players'].append(player_info)
+
+            team_results.append(team_info)
+
+        return jsonify(success=True, data=team_results), 200
 
     except Exception as e:
         return jsonify(success=False, error=str(e)), 500

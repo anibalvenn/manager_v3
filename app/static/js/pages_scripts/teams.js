@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const teamRow = editButton.closest('tr');
       const teamIdInRow = teamRow.getAttribute('data-team-id')
 
-      window.location.href = `/edit_team_players/2/${teamIdInRow}`;
+      window.location.href = `/edit_team_players/${currentChampionshipID}/${teamIdInRow}`;
 
     });
     editCell.appendChild(editButton);

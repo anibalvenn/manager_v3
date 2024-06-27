@@ -149,28 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
     editCell.appendChild(editButton);
     row.appendChild(editCell);
     // Create and append delete button
-    const removeCell = document.createElement('td');
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'Remove';
-    removeButton.className = 'bg-red-600 text-white hover:bg-red-900 px-3 py-1 rounded-md remove-button';
-    removeButton.addEventListener('click', function () {
-      const rowId = this.closest('tr').id;
-      // Remove "rowplayer" string from the row ID to get the player ID
-      const playerId = rowId.replace('rowplayer', '');
-      const spanRemovePlayer = document.getElementById('spanRemovePlayer');
-      spanRemovePlayer.textContent = player.name;
 
-      const modalRemovePlayer = document.getElementById('modalRemovePlayer');
-      modalRemovePlayer.setAttribute('data-player-id', playerId);
-
-      // Add event listener to the "Delete" button
-
-      showRemoveModal();
-    });
-
-
-    removeCell.appendChild(removeButton);
-    row.appendChild(removeCell);
 
 
     return row;

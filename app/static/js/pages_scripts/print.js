@@ -33,6 +33,22 @@ document.addEventListener('DOMContentLoaded', function () {
     generateCurrentSeriesPdfListen(currentSerieID)
   });
 
+  const btnPreviewOverallTeamsResults = document.getElementById('btnPreviewOverallTeamsResults');
+  btnPreviewOverallTeamsResults.addEventListener('click', () => {
+    // Get the championship data from the row
+    previewOverallTeamsSeriesResults(currentChampionshipID)
+  });
+  const btnPrintOverallTeamsResults = document.getElementById('btnPrintOverallTeamsResults');
+  btnPrintOverallTeamsResults.addEventListener('click', () => {
+    // Get the championship data from the row
+    generateOverallTeamsSeriesResultsPDF(currentChampionshipID)
+  });
+  const btnPrintPlayerZettel = document.getElementById('btnPrintPlayerZettel');
+  btnPrintPlayerZettel.addEventListener('click', () => {
+    // Get the championship data from the row
+    generatePlayerZettelPDF(currentChampionshipID)
+  });
+
   async function generatePDFSeriesResult() {
     if (!currentSerieID) {
       alert("Please select a series to get results");
@@ -415,74 +431,74 @@ document.addEventListener('DOMContentLoaded', function () {
         mergedPdf.addPage(templatePage);
 
         const page = mergedPdf.getPage(mergedPdf.getPageCount() - 1);
-        const tischName =tisch.tischName
+        const tischName = tisch.tischName
         const labels = extractLabels(tischName);
         const tischLabel = labels.tischLabel
         const seriesLabel = labels.seriesLabel
-        const todayDate= getCurrentDateFormatted()
-        if(numPlayers==4){  
+        const todayDate = getCurrentDateFormatted()
+        if (numPlayers == 4) {
           page.drawText(`${todayDate}`, { x: 110, y: 760, size: 12 });
           page.drawText(`${tischLabel}`, { x: 535, y: 760, size: 20 });
           page.drawText(`${seriesLabel}`, { x: 455, y: 760, size: 20 });
           // Customize the template page with the tisch and player data
           page.drawText(`${tisch.tischName}`, { x: 200, y: 760, size: 12 });
           page.drawText(`, T_ID: ${tisch.tischID}`, { x: 320, y: 760, size: 6 });
-          page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 261, y: 738, size: 8 });
-          page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 341, y: 738, size: 8 });
-          page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 421, y: 738, size: 8 });
-          page.drawText(`${truncateString(tisch.namePosD,15)}`, { x: 501, y: 738, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 261, y: 738, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 341, y: 738, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 421, y: 738, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 501, y: 738, size: 8 });
           page.drawText(`${tisch.idPosA}`, { x: 300, y: 717, size: 14 });
           page.drawText(`${tisch.idPosB}`, { x: 380, y: 717, size: 14 });
           page.drawText(`${tisch.idPosC}`, { x: 460, y: 717, size: 14 });
           page.drawText(`${tisch.idPosD}`, { x: 540, y: 717, size: 14 });
-  
-         
+
+
         }
-        if(numPlayers==3){  
+        if (numPlayers == 3) {
           page.drawText(`${todayDate}`, { x: 110, y: 760, size: 12 });
           page.drawText(`${tischLabel}`, { x: 520, y: 760, size: 20 });
           page.drawText(`${seriesLabel}`, { x: 430, y: 760, size: 20 });
           // Customize the template page with the tisch and player data
           page.drawText(`${tisch.tischName}`, { x: 200, y: 760, size: 12 });
           page.drawText(`, T_ID: ${tisch.tischID}`, { x: 320, y: 760, size: 6 });
-          if(tisch.idPosA==-1){
-            page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 301, y: 738, size: 10 });
-            page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 391, y: 738, size: 10 });
-            page.drawText(`${truncateString(tisch.namePosD,15)}`, { x: 481, y: 738, size: 10 });
+          if (tisch.idPosA == -1) {
+            page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 301, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 391, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 481, y: 738, size: 10 });
             page.drawText(`${tisch.idPosB}`, { x: 360, y: 712, size: 16 });
             page.drawText(`${tisch.idPosC}`, { x: 450, y: 712, size: 16 });
             page.drawText(`${tisch.idPosD}`, { x: 540, y: 712, size: 16 });
           }
-          if(tisch.idPosB==-1){
-            page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 301, y: 738, size: 10 });
-            page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 391, y: 738, size: 10 });
-            page.drawText(`${truncateString(tisch.namePosD,15)}`, { x: 481, y: 738, size: 10 });
+          if (tisch.idPosB == -1) {
+            page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 301, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 391, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 481, y: 738, size: 10 });
             page.drawText(`${tisch.idPosA}`, { x: 360, y: 712, size: 16 });
             page.drawText(`${tisch.idPosC}`, { x: 450, y: 712, size: 16 });
             page.drawText(`${tisch.idPosD}`, { x: 540, y: 712, size: 16 });
           }
-          if(tisch.idPosC==-1){
-            page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 301, y: 738, size: 10 });
-            page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 391, y: 738, size: 10 });
-            page.drawText(`${truncateString(tisch.namePosD,15)}`, { x: 481, y: 738, size: 10 });
+          if (tisch.idPosC == -1) {
+            page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 301, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 391, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 481, y: 738, size: 10 });
             page.drawText(`${tisch.idPosA}`, { x: 360, y: 712, size: 16 });
             page.drawText(`${tisch.idPosB}`, { x: 450, y: 712, size: 16 });
             page.drawText(`${tisch.idPosD}`, { x: 540, y: 712, size: 16 });
           }
-          if(tisch.idPosD==-1){
-            page.drawText(`${truncateString(tisch.namePosA,15)}`, { x: 301, y: 738, size: 10 });
-            page.drawText(`${truncateString(tisch.namePosB,15)}`, { x: 391, y: 738, size: 10 });
-            page.drawText(`${truncateString(tisch.namePosC,15)}`, { x: 481, y: 738, size: 10 });
+          if (tisch.idPosD == -1) {
+            page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 301, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 391, y: 738, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 481, y: 738, size: 10 });
             page.drawText(`${tisch.idPosA}`, { x: 360, y: 712, size: 16 });
             page.drawText(`${tisch.idPosB}`, { x: 450, y: 712, size: 16 });
             page.drawText(`${tisch.idPosC}`, { x: 540, y: 712, size: 16 });
           }
-          
-        
-        }
-    
 
-   
+
+        }
+
+
+
       }
 
       const pdfBytes = await mergedPdf.save();
@@ -520,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const day = String(today.getDate()).padStart(2, '0');
     const month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
     const year = today.getFullYear();
-  
+
     return `${day}-${month}-${year}`;
   }
   function truncateString(str, maxLength) {
@@ -529,4 +545,387 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     return str;
   }
+
+  async function getSingleSeriesTeamResults(championshipId, seriesId) {
+    try {
+      const response = await fetch('/api/get_teams_results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ championship_id: championshipId, series_id: seriesId })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        return result.data
+        // Handle the result data, e.g., update the UI
+      } else {
+        alert('Error fetching single series team results: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to fetch single series team results');
+    }
+  }
+
+  async function getOverallTeamsSeriesResults(championshipId) {
+    try {
+      const response = await fetch('/api/get_teams_results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ championship_id: championshipId })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        return result.data
+        // Handle the result data, e.g., update the UI
+      } else {
+        alert('Error fetching overall teams series results: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to fetch overall teams series results');
+    }
+  }
+  async function previewSingleSeriesTeamResults(championshipId, seriesId) {
+    const data = await getSingleSeriesTeamResults(championshipId, seriesId);
+
+    const resultContainer = document.getElementById('resultContainer');
+    resultContainer.innerHTML = ''; // Clear previous results
+
+    data.forEach(team => {
+      // Create the table for each team
+      const table = document.createElement('table');
+      table.classList.add('min-w-full', 'bg-white', 'border', 'border-gray-300', 'mb-4');
+
+      // Create the table header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+
+      // Create header cells
+      const headers = ['Team Name', 'Player ID', 'Series Name', 'Total Points'];
+      headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Create the table body
+      const tbody = document.createElement('tbody');
+      let teamTotalPoints = 0;
+
+      team.players.forEach(player => {
+        player.series_points.forEach(point => {
+          const row = document.createElement('tr');
+
+          // Team name cell
+          const teamNameCell = document.createElement('td');
+          teamNameCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+          teamNameCell.textContent = team.team_name;
+          row.appendChild(teamNameCell);
+
+          // Player ID cell
+          const playerIdCell = document.createElement('td');
+          playerIdCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+          playerIdCell.textContent = player.player_id;
+          row.appendChild(playerIdCell);
+
+          // Series name cell
+          const seriesNameCell = document.createElement('td');
+          seriesNameCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+          seriesNameCell.textContent = point.series_name;
+          row.appendChild(seriesNameCell);
+
+          // Total points cell
+          const totalPointsCell = document.createElement('td');
+          totalPointsCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+          totalPointsCell.textContent = point.total_points;
+          row.appendChild(totalPointsCell);
+
+          // Accumulate team total points
+          teamTotalPoints += point.total_points;
+
+          tbody.appendChild(row);
+        });
+      });
+
+      // Append total points row for the team
+      const totalRow = document.createElement('tr');
+      const totalLabelCell = document.createElement('td');
+      totalLabelCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300', 'font-bold');
+      totalLabelCell.setAttribute('colspan', '3');
+      totalLabelCell.textContent = 'Total Points';
+      totalRow.appendChild(totalLabelCell);
+
+      const totalPointsCell = document.createElement('td');
+      totalPointsCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300', 'font-bold');
+      totalPointsCell.textContent = teamTotalPoints;
+      totalRow.appendChild(totalPointsCell);
+
+      tbody.appendChild(totalRow);
+      table.appendChild(tbody);
+      resultContainer.appendChild(table);
+    });
+  }
+
+  async function previewOverallTeamsSeriesResults(championshipId) {
+    const data = await getOverallTeamsSeriesResults(championshipId);
+
+    // Sort teams by descending order of total points
+    data.sort((a, b) => {
+      const aTotalPoints = a.players.reduce((acc, player) => acc + player.series_points.reduce((sum, point) => sum + point.total_points, 0), 0);
+      const bTotalPoints = b.players.reduce((acc, player) => acc + player.series_points.reduce((sum, point) => sum + point.total_points, 0), 0);
+      return bTotalPoints - aTotalPoints;
+    });
+
+    const resultContainer = document.getElementById('resultContainer');
+    resultContainer.innerHTML = ''; // Clear previous results
+
+    data.forEach(team => {
+      // Create a table for each team
+      const table = document.createElement('table');
+      table.classList.add('min-w-full', 'bg-white', 'border', 'border-gray-300', 'mb-4');
+
+      // Create the team name header row
+      const teamNameRow = document.createElement('tr');
+      const teamNameCell = document.createElement('th');
+      teamNameCell.classList.add('px-4', 'py-2', 'bg-gray-100', 'text-left', 'font-bold');
+      teamNameCell.setAttribute('colspan', team.players.length + 3);
+      teamNameCell.textContent = `Team: ${team.team_name}`;
+      teamNameRow.appendChild(teamNameCell);
+      table.appendChild(teamNameRow);
+
+      // Create the player IDs header row
+      const playerIDsHeaderRow = document.createElement('tr');
+      const seriesNameHeader = document.createElement('th');
+      seriesNameHeader.classList.add('px-4', 'py-2', 'border', 'border-gray-300');
+      seriesNameHeader.textContent = 'Series Name';
+      playerIDsHeaderRow.appendChild(seriesNameHeader);
+
+      team.players.forEach(player => {
+        const playerIDHeader = document.createElement('th');
+        playerIDHeader.classList.add('px-4', 'py-2', 'border', 'border-gray-300');
+        playerIDHeader.textContent = `Player ID ${player.player_id}`;
+        playerIDsHeaderRow.appendChild(playerIDHeader);
+      });
+
+      const totalPointsHeader = document.createElement('th');
+      totalPointsHeader.classList.add('px-4', 'py-2', 'border', 'border-gray-300');
+      totalPointsHeader.textContent = 'Total Points';
+      playerIDsHeaderRow.appendChild(totalPointsHeader);
+      table.appendChild(playerIDsHeaderRow);
+
+      // Create the table body
+      const tbody = document.createElement('tbody');
+      let teamTotalPoints = 0;
+      const playerTotals = new Array(team.players.length).fill(0);
+
+      // Calculate series points for each player and total points for the team
+      const seriesMap = new Map();
+      team.players.forEach(player => {
+        player.series_points.forEach(point => {
+          if (!seriesMap.has(point.series_name)) {
+            seriesMap.set(point.series_name, { total: 0, points: new Array(team.players.length).fill(0) });
+          }
+          const series = seriesMap.get(point.series_name);
+          const playerIndex = team.players.findIndex(p => p.player_id === player.player_id);
+          series.points[playerIndex] = point.total_points;
+          series.total += point.total_points;
+          playerTotals[playerIndex] += point.total_points;
+        });
+      });
+
+      // Add rows to the table body
+      seriesMap.forEach((series, seriesName) => {
+        const row = document.createElement('tr');
+
+        // Series name cell
+        const seriesNameCell = document.createElement('td');
+        seriesNameCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+        seriesNameCell.textContent = seriesName;
+        row.appendChild(seriesNameCell);
+
+        // Player points cells
+        series.points.forEach(points => {
+          const pointsCell = document.createElement('td');
+          pointsCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+          pointsCell.textContent = points;
+          row.appendChild(pointsCell);
+        });
+
+        // Total points cell
+        const totalPointsCell = document.createElement('td');
+        totalPointsCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+        totalPointsCell.textContent = series.total;
+        row.appendChild(totalPointsCell);
+
+        tbody.appendChild(row);
+        teamTotalPoints += series.total;
+      });
+
+      // Add the last row for sum of team points
+      const totalRow = document.createElement('tr');
+      const totalRowLabel = document.createElement('td');
+      totalRowLabel.classList.add('px-4', 'py-0', 'border', 'border-gray-300', 'font-bold');
+      totalRowLabel.textContent = 'Sum Team Points';
+      totalRow.appendChild(totalRowLabel);
+
+      playerTotals.forEach(playerTotal => {
+        const playerTotalCell = document.createElement('td');
+        playerTotalCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300');
+        playerTotalCell.textContent = playerTotal;
+        totalRow.appendChild(playerTotalCell);
+      });
+
+      const teamTotalPointsCell = document.createElement('td');
+      teamTotalPointsCell.classList.add('px-4', 'py-0', 'border', 'border-gray-300', 'font-bold');
+      teamTotalPointsCell.textContent = teamTotalPoints;
+      totalRow.appendChild(teamTotalPointsCell);
+
+      tbody.appendChild(totalRow);
+      table.appendChild(tbody);
+      resultContainer.appendChild(table);
+    });
+  }
+
+
+  async function generateOverallTeamsSeriesResultsPDF(championshipId) {
+    const data = await getOverallTeamsSeriesResults(championshipId);
+
+    // Sort teams by descending order of sum of total points
+    data.sort((a, b) => {
+      const aTotalPoints = a.players.reduce((acc, player) => acc + player.series_points.reduce((sum, point) => sum + point.total_points, 0), 0);
+      const bTotalPoints = b.players.reduce((acc, player) => acc + player.series_points.reduce((sum, point) => sum + point.total_points, 0), 0);
+      return bTotalPoints - aTotalPoints;
+    });
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    data.forEach(team => {
+      const headers = [
+        ['Team: ' + team.team_name, ...new Array(team.players.length + 2).fill('')], // Team name header
+        ['Series Name', ...team.players.map(player => `Player ID ${player.player_id}`), 'Total Points'] // Column headers
+      ];
+      const body = [];
+      let teamTotalPoints = 0;
+      const playerTotals = new Array(team.players.length).fill(0);
+
+      // Calculate series points for each player and total points for the team
+      const seriesMap = new Map();
+      team.players.forEach(player => {
+        player.series_points.forEach(point => {
+          if (!seriesMap.has(point.series_name)) {
+            seriesMap.set(point.series_name, { total: 0, points: new Array(team.players.length).fill(0) });
+          }
+          const series = seriesMap.get(point.series_name);
+          const playerIndex = team.players.findIndex(p => p.player_id === player.player_id);
+          series.points[playerIndex] = point.total_points;
+          series.total += point.total_points;
+          playerTotals[playerIndex] += point.total_points;
+        });
+      });
+
+      // Add rows to the table body
+      seriesMap.forEach((series, seriesName) => {
+        const row = [seriesName, ...series.points, series.total];
+        body.push(row);
+        teamTotalPoints += series.total;
+      });
+
+      // Add the last row for sum of team points
+      const totalRow = ['Sum Team Points', ...playerTotals, teamTotalPoints];
+      body.push(totalRow);
+
+      // Check if a new table fits on the current page, if not, add a new page
+      if (doc.lastAutoTable && doc.lastAutoTable.finalY + (body.length + 2) * 10 > doc.internal.pageSize.height) {
+        doc.addPage();
+      }
+
+      doc.autoTable({
+        head: headers,
+        body: body,
+        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 10,
+        theme: 'grid',
+        headStyles: { fillColor: [211, 211, 211] },
+        footStyles: { fillColor: [211, 211, 211] }
+      });
+    });
+
+    doc.save(`Overall_Teams_Series_Results_${championshipId}.pdf`);
+  }
+
+
+  async function fetchPlayerTischPositions(championshipId) {
+    try {
+      const response = await fetch(`/get_player_tisch_positions/${championshipId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        return result.data;
+      } else {
+        alert('Error fetching player tisch positions: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to fetch player tisch positions');
+    }
+  }
+
+  async function generatePlayerTischPositionsPDF(championshipId) {
+    const data = await fetchPlayerTischPositions(championshipId);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+  
+    doc.setFontSize(18);
+    doc.text(`Championship ID: ${championshipId}`, 14, 15);
+  
+    Object.keys(data).forEach((playerId, index) => {
+      if (index > 0) {
+        doc.addPage();
+      }
+  
+      const player = data[playerId][0];
+      const playerName = player.player_name;
+  
+      doc.setFontSize(14);
+      doc.text(`Player Name: ${playerName} (ID: ${playerId})`, 14, 25);
+  
+      const headers = [['Series Name', 'Tisch Name', 'Position']];
+      const body = data[playerId].map(item => [item.series_name, item.tisch_name, item.position]);
+  
+      doc.autoTable({
+        head: headers,
+        body: body,
+        startY: 30,
+        theme: 'grid',
+        headStyles: { fillColor: [211, 211, 211] },
+        footStyles: { fillColor: [211, 211, 211] }
+      });
+    });
+  
+    doc.save(`Player_Tisch_Positions_${championshipId}.pdf`);
+  }
+  
+  function generatePlayerZettelPDF(championshipId) {
+
+    if (championshipId) {
+      generatePlayerTischPositionsPDF(championshipId);
+    } else {
+      alert('Please enter a valid championship ID');
+    }
+  }
+
+
+
 })

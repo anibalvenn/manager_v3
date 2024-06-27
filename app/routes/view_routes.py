@@ -4,6 +4,7 @@ from app.models.championship_player_model import Championship_Player_Model
 from app.models.player_model import Player_Model
 from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
+from app.models.teams_model import Teams_Model
 from app.models.tische_model import Tische_Model
 from app.services import championship_players_service, series_players_service, team_players_service,tische_players_service
 
@@ -54,12 +55,22 @@ def init_routes(app):
     
     @app.route('/edit_team_players/<int:championship_id>/<int:team_id>')
     def show_team_players(championship_id, team_id):
-        team_name = team_players_service.get_team_name(team_id)
-        print(team_name)
-        team_players, other_players = team_players_service.get_team_players_by_championship(championship_id=championship_id,team_id=team_id)
+        if team_id == 0:
+            team_name = "New Team"  # Placeholder for new team creation
+            team_players = []
+            team_players, other_players = team_players_service.get_team_players_by_championship(championship_id=championship_id, team_id=team_id)
+        else:
+            team = Teams_Model.select_team(team_id=team_id)
+            team_name=team.team_name
+            team_players, other_players = team_players_service.get_team_players_by_championship(championship_id=championship_id, team_id=team_id)
 
-        return render_template('edit_team_players.html', team_name=team_name,team_id=team_id, team_players=team_players,
-                               other_players=other_players, championship_id=championship_id)
+        return render_template('edit_team_players.html', 
+                            team_name=team_name,
+                            team_id=team_id, 
+                            team_players=team_players,
+                            other_players=other_players, 
+                            championship_id=championship_id)
+
   
     @app.route('/edit_serie_tische/<int:championship_id>/<int:serie_id>', defaults={'rank_series_id': None})
     @app.route('/edit_serie_tische/<int:championship_id>/<int:serie_id>/<int:rank_series_id>')
