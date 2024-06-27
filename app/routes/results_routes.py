@@ -201,9 +201,10 @@ def import_series_results():
             length_existing_serien = len(championship_serien)
             current_championship = Championship_Model.select_championship(championship_id=championship_id)
             current_championship_acronym = current_championship.acronym
-            print(current_championship_acronym, length_existing_serien)
-            series_name = current_championship_acronym + '_S#' + str(length_existing_serien + 1)
-            new_series = Series_Model.insert_series(championship_id, series_name)
+            # cant b called series_name bcz series_name'll b used 2 the player dictionary below so its series_label
+            series_label = current_championship_acronym + '_S#' + str(length_existing_serien + 1)
+            series_name = series['series']
+            new_series = Series_Model.insert_series(championship_id, series_name=series_label)
 
             for player in players_data:
                 series_points = next((sp['points'] for sp in player['series_points'] if sp['series'] == series_name), None)
