@@ -1,5 +1,7 @@
 import math
 from app.models import Championship_Player_Model, Tische_Model, Series_Model
+from app.models.series_player_model import Series_Players_Model
+from app.services.series_players_service import set_initial_values_to_players_into_series
 
 def create_4er_random_rounds(random_series_amount, current_championship_ID, current_championship_acronym):
     playerIDsArray = get_player_ids_for_championship(current_championship_ID)
@@ -19,6 +21,9 @@ def create_4er_random_rounds(random_series_amount, current_championship_ID, curr
         series_name = current_championship_acronym + '_S#' + str(length_existing_serien + 1)
         series = Series_Model().insert_series(current_championship_ID, series_name=series_name, 
                                               is_random=True, seek_4er_tische=True)
+        
+        set_initial_values_to_players_into_series(championship_id=current_championship_ID,series=series)
+
         if not bau_randomische_tische(i, single_serie_tische_array=single_serie_tische_array, 
                                       series=series):
             # If creation of tisches fails, handle the error here
@@ -26,7 +31,6 @@ def create_4er_random_rounds(random_series_amount, current_championship_ID, curr
             success = False
     
     return success
-     
 def generate_one_serie_tische_array(groups):
     # The zip function combines elements from each group with the same index
     return [list(group) for group in zip(*groups)]
