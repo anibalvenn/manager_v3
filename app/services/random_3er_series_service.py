@@ -1,7 +1,7 @@
 import math
 from app.models import Championship_Player_Model, Tische_Model, Series_Model
 from app.models.series_player_model import Series_Players_Model
-from app.services.series_players_service import set_initial_values_to_players_into_series
+from app.services.utils import get_player_ids_for_championship, set_initial_values_to_players_into_series
 
 def create_3er_random_rounds(random_series_amount, current_championship_ID, current_championship_acronym):
     playerIDsArray = get_player_ids_for_championship(current_championship_ID)
@@ -72,15 +72,6 @@ def bau_randomische_tische(series_index, single_serie_tische_array, series):
 
     return True  # Return True if all insertions are successful
 
-
-def get_player_ids_for_championship(championship_id):
-
-    # Query players registered for the given championship
-    registered_players_from_selection = Championship_Player_Model.select_championship_players_by_championship_id(championship_id=championship_id)
-
-    # Extract PlayerIDs of registered players for the championship
-    registered_player_ids = [player.PlayerID for player in registered_players_from_selection]
-    return registered_player_ids
 
 def rotate_groups(groups):
       # Apply the rotation logic to each group with its index

@@ -4,6 +4,8 @@ from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
 from sqlalchemy import func, desc
 
+from app.services.random_3er_series_service import get_player_ids_for_championship
+
 
 def get_players_for_series(championship_id):
     # Query all players with their group information for the given championship
@@ -79,3 +81,14 @@ def get_overall_results(championship_id):
     .order_by(desc('TotalPoints')).all()
 
     return overall_results
+
+def set_initial_values_to_players_into_series(championship_id, series):
+    # Extract series ID from the series object
+    series_id = series.SeriesID
+
+    # Get player IDs for the given championship
+    playerIDsArray = get_player_ids_for_championship(championship_id)
+
+    # Insert each player into the Series_Players_Model with TotalPoints set to 0
+    for player_id in playerIDsArray:
+        Series_Players_Model.insert_series_player_record(series_id=series_id, player_id=player_id, total_points=0)

@@ -6,6 +6,7 @@ from app.models.series_player_model import Series_Players_Model
 from app.models.tische_model import Tische_Model
 from app.services.random_3er_series_service import create_3er_random_rounds, get_player_ids_for_championship
 from app.services.random_4er_series_service import create_4er_random_rounds
+from app.services.utils import set_initial_values_to_players_into_series
 
 # Create a Blueprint for series routes
 series_bp = Blueprint('series_bp', __name__)
@@ -59,11 +60,7 @@ def add_ranked_series():
                                    is_random=False,
                                     seek_4er_tische= seek_4er_tische)
         
-        playerIDsArray = get_player_ids_for_championship(championship_id=current_campionship_ID)
-
-        for player_id in playerIDsArray:
-            Series_Players_Model.insert_series_player_record(series_id=series.SeriesID, player_id=player_id, total_points=0)
-        
+        set_initial_values_to_players_into_series(championship_id=current_campionship_ID,series=series)
 
     return jsonify({'message': 'series added successfully'}), 201
 
