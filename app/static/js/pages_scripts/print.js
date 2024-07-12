@@ -30,7 +30,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const btnPrintCurrentSeriesListen = document.getElementById('btnPrintCurrentSeriesListen');
   btnPrintCurrentSeriesListen.addEventListener('click', () => {
     // Get the championship data from the row
-    generateCurrentSeriesPdfListen(currentSerieID)
+    generateCurrentSeriesPdfListenComplete(currentSerieID)
+  });
+
+  const btnPrintCurrentSeriesListenDatei = document.getElementById('btnPrintCurrentSeriesListenDatei');
+  btnPrintCurrentSeriesListenDatei.addEventListener('click', () => {
+    // Get the championship data from the row
+    generateCurrentSeriesPdfListenDatei(currentSerieID)
   });
 
   const btnPreviewOverallTeamsResults = document.getElementById('btnPreviewOverallTeamsResults');
@@ -388,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  async function generateCurrentSeriesPdfListen(currentSerieID) {
+  async function generateCurrentSeriesPdfListenComplete(currentSerieID) {
     if (!currentSerieID) {
       alert("No series ID found in local storage");
       return;
@@ -503,6 +509,120 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const pdfBytes = await mergedPdf.save();
 
+      // Trigger download of the PDF
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Series_${currentSerieID}_Tisch_Listen.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF');
+    }
+  }
+
+  async function generateCurrentSeriesPdfListenDatei(currentSerieID) {
+    if (!currentSerieID) {
+      alert("No series ID found in local storage");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`/get_serie_tische/${currentSerieID}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+  
+      const tische = await response.json();
+  
+      const { PDFDocument } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+  
+      for (const tisch of tische) {
+        const positions = [
+          { pos: 'PosA', name: tisch.namePosA, id: tisch.idPosA },
+          { pos: 'PosB', name: tisch.namePosB, id: tisch.idPosB },
+          { pos: 'PosC', name: tisch.namePosC, id: tisch.idPosC },
+          { pos: 'PosD', name: tisch.namePosD, id: tisch.idPosD }
+        ];
+  
+        const validPositions = positions.filter(position => position.id > 0);
+        const numPlayers = validPositions.length;
+  
+        if (numPlayers !== 3 && numPlayers !== 4) {
+          continue; // Skip if the number of players is not 3 or 4
+        }
+  
+        const page = pdfDoc.addPage([595.28, 841.89]); // A4 size in points
+        const { width, height } = page.getSize();
+        const tischName = tisch.tischName;
+        const labels = extractLabels(tischName);
+        const tischLabel = labels.tischLabel;
+        const seriesLabel = labels.seriesLabel;
+        const todayDate = getCurrentDateFormatted();
+  
+        if (numPlayers === 4) {
+          page.drawText(`${tisch.tischName}`, { x: 60, y: height - 46, size: 12 });
+          page.drawText(`${todayDate}`, { x: 305, y: height - 45, size: 12 });
+          page.drawText(`${seriesLabel}`, { x: 435, y: height - 45, size: 20 });
+          page.drawText(`${tischLabel}`, { x: 525, y: height - 45, size: 20 });
+          page.drawText(`, T_ID: ${tisch.tischID}`, { x: 560, y: height - 45, size: 6 });
+          // Customize the template page with the tisch and player data
+          page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 221, y: height - 73, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 301, y: height - 73, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 381, y: height - 73, size: 8 });
+          page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 461, y: height - 73, size: 8 });
+          page.drawText(`${tisch.idPosA}`, { x: 240, y: height - 112, size: 14 });
+          page.drawText(`${tisch.idPosB}`, { x: 325, y: height - 112, size: 14 });
+          page.drawText(`${tisch.idPosC}`, { x: 405, y: height - 112, size: 14 });
+          page.drawText(`${tisch.idPosD}`, { x: 489, y: height - 112, size: 14 });
+        }
+  
+        if (numPlayers === 3) {
+          page.drawText(`${tisch.tischName}`, { x: 70, y: height - 47, size: 12 });
+          page.drawText(`${todayDate}`, { x: 290, y: height - 47, size: 12 });
+          page.drawText(`${seriesLabel}`, { x: 435, y: height - 47, size: 20 });
+          page.drawText(`${tischLabel}`, { x: 525, y: height - 47, size: 20 });
+          page.drawText(`, T_ID: ${tisch.tischID}`, { x: 560, y: height - 45, size: 6 });
+          // Customize the template page with the tisch and player data
+  
+          if (tisch.idPosA === -1) {
+            page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 251, y: height - 83, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 351, y: height - 83, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 451, y: height - 83, size: 10 });
+            page.drawText(`${tisch.idPosB}`, { x: 269, y: height - 109, size: 16 });
+            page.drawText(`${tisch.idPosC}`, { x: 369, y: height - 109, size: 16 });
+            page.drawText(`${tisch.idPosD}`, { x: 472, y: height - 109, size: 16 });
+          } else if (tisch.idPosB === -1) {
+            page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 251, y: height - 83, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 351, y: height - 83, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 451, y: height - 83, size: 10 });
+            page.drawText(`${tisch.idPosA}`, { x: 269, y: height - 109, size: 16 });
+            page.drawText(`${tisch.idPosC}`, { x: 369, y: height - 109, size: 16 });
+            page.drawText(`${tisch.idPosD}`, { x: 472, y: height - 109, size: 16 });
+          } else if (tisch.idPosC === -1) {
+            page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 251, y: height - 83, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 351, y: height - 83, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 451, y: height - 83, size: 10 });
+            page.drawText(`${tisch.idPosA}`, { x: 269, y: height - 109, size: 16 });
+            page.drawText(`${tisch.idPosB}`, { x: 369, y: height - 109, size: 16 });
+            page.drawText(`${tisch.idPosD}`, { x: 472, y: height - 109, size: 16 });
+          } else if (tisch.idPosD === -1) {
+            page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 251, y: height - 83, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 351, y: height - 83, size: 10 });
+            page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 451, y: height - 83, size: 10 });
+            page.drawText(`${tisch.idPosA}`, { x: 269, y: height - 109, size: 16 });
+            page.drawText(`${tisch.idPosB}`, { x: 369, y: height - 109, size: 16 });
+            page.drawText(`${tisch.idPosC}`, { x: 472, y: height - 109, size: 16 });
+          }
+        }
+      }
+  
+      const pdfBytes = await pdfDoc.save();
+  
       // Trigger download of the PDF
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
