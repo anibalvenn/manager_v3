@@ -1,2 +1,4 @@
 db/*.csv
+*.csv
 venv
+.env

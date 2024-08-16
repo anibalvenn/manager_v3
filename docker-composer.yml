@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        NGROK_AUTH_TOKEN: ${NGROK_AUTH_TOKEN}
+    ports:
+      - "5000:5000"
