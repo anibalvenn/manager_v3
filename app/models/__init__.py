@@ -1,3 +1,4 @@
+from app.models.user_model import User_Model
 from app.models.championship_model import Championship_Model
 from app.models.championship_player_model import Championship_Player_Model
 from app.models.player_model import Player_Model

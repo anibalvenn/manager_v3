@@ -1,4 +1,5 @@
-from flask import render_template
+from flask import redirect, render_template, url_for
+from flask_login import login_required
 from app.models.championship_model import Championship_Model
 from app.models.championship_player_model import Championship_Player_Model
 from app.models.player_model import Player_Model
@@ -12,37 +13,46 @@ from app.services import championship_players_service, series_players_service, t
 # routes/view_routes.py
 def init_routes(app):
     @app.route('/')
-    def home():
-        return render_template('championships.html')
+    def index():
+        return redirect(url_for('auth.login'))
+
 
     @app.route('/championships.html')
+    @login_required
     def championships():
         return render_template('championships.html')
 
     @app.route('/series.html')
+    @login_required
     def series():
         return render_template('series.html')
 
     @app.route('/tische.html')
+    @login_required
     def tische():
         return render_template('tische.html')
 
     @app.route('/players.html')
+    @login_required
     def players():
         return render_template('players.html')
 
     @app.route('/teams.html')
+    @login_required
     def teams():
         return render_template('teams.html')
 
     @app.route('/print.html')
+    @login_required
     def print_page_html():
         return render_template('print.html')
     @app.route('/i_o.html')
+    @login_required
     def i_o():
         return render_template('i_o.html')
         
     @app.route('/championship_players/<int:championship_id>')
+    @login_required
     def show_championship_players(championship_id):
         championship_name = championship_players_service.get_championship_name(championship_id)
         registered_players, unregistered_players = championship_players_service.get_players_for_championship(championship_id)
@@ -54,6 +64,7 @@ def init_routes(app):
                                unregistered_players=unregistered_players, championship_id=championship_id)
     
     @app.route('/edit_team_players/<int:championship_id>/<int:team_id>')
+    @login_required
     def show_team_players(championship_id, team_id):
         if team_id == 0:
             team_name = "New Team"  # Placeholder for new team creation
@@ -74,6 +85,7 @@ def init_routes(app):
   
     @app.route('/edit_serie_tische/<int:championship_id>/<int:serie_id>', defaults={'rank_series_id': None})
     @app.route('/edit_serie_tische/<int:championship_id>/<int:serie_id>/<int:rank_series_id>')
+    @login_required
     def show_series_players(championship_id, serie_id, rank_series_id):
         championship = Championship_Model().select_championship(championship_id=championship_id)
         series = Series_Model().select_series(series_id=serie_id)
@@ -149,6 +161,7 @@ def init_routes(app):
                                 series=series,
                                 championship=championship)    
     @app.route('/simple_serie_results/<int:championship_id>/<int:serie_id>')
+    @login_required
     def show_series_simple_results(championship_id, serie_id):
         championship= Championship_Model().select_championship(championship_id=championship_id)
         series=Series_Model().select_series(series_id=serie_id)
@@ -160,6 +173,7 @@ def init_routes(app):
                             championship=championship)
     
     @app.route('/edit_tisch_results/<int:tisch_id>')
+    @login_required
     def edit_tisch_results(tisch_id):
         tisch = Tische_Model().select_tisch(tisch_id=tisch_id)
         serie=Series_Model().select_series(series_id=tisch.SeriesID)
