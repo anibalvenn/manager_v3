@@ -36,7 +36,7 @@ def init_routes(app):
         return render_template('teams.html')
 
     @app.route('/print.html')
-    def print():
+    def print_page_html():
         return render_template('print.html')
     @app.route('/i_o.html')
     def i_o():
@@ -83,22 +83,26 @@ def init_routes(app):
         if rank_series_id is not None:
             if rank_series_id == 0:
                 # Fetch the players ordered by overall total points across all series
-                players_ordered_by_points = series_players_service.get_overall_results(championship_id)
-                for player, total_points in players_ordered_by_points:
-                    print(f"PlayerID: {player.PlayerID}")
-                    print(f"Name: {player.name}")
-                    print(f"TotalPoints: {total_points}")
-                    
-                    player_info = Player_Model.query.filter_by(PlayerID=player.PlayerID).first()
+                players_NOT_ordered_by_points = series_players_service.get_players_overall_points(championship_id)
+                print(players_NOT_ordered_by_points)
+                players_ordered_by_points = sorted(players_NOT_ordered_by_points.values(), key=lambda x: x['total_points'], reverse=True)
+
+                for player_data in players_ordered_by_points:
+                    player_id = player_data['player_id']
+                    print(f"PlayerID: {player_id}")
+                    print(f"Name: {player_data['player_name']}")
+                    print(f"TotalPoints: {player_data['total_points']}")                
+
+                    player_info = Player_Model.query.filter_by(PlayerID=player_id).first()
                     if player_info:
                         # Get the player group from Championship_Player_Model
-                        player_group_info = Championship_Player_Model.select_championship_player(player_id=player.PlayerID, championship_id=championship_id)
+                        player_group_info = Championship_Player_Model.select_championship_player(player_id=player_id, championship_id=championship_id)
                         player_group = player_group_info.player_group if player_group_info else None
                         
                         registered_players.append({
-                            'name': player_info.name,
-                            'PlayerID': player.PlayerID,
-                            'TotalPoints': total_points,
+                            'name': player_data['player_name'],
+                            'PlayerID': player_data['player_id'],
+                            'TotalPoints': player_data['total_points'],
                             'player_group': player_group
                         })
             else:

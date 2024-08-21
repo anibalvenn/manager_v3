@@ -1,8 +1,11 @@
+from flask import jsonify
 from app.models import Championship_Player_Model, Player_Model, Championship_Model
 from app import db
 from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
 from sqlalchemy import func, desc
+from sqlalchemy.exc import SQLAlchemyError
+
 
 from app.services.random_3er_series_service import get_player_ids_for_championship
 
@@ -70,15 +73,54 @@ def get_players_for_simple_series_results(serie_id, championship_id):
     return players_data
 
 def get_overall_results(championship_id):
-    # Fetch and aggregate results across all series for the championship
-    overall_results = db.session.query(
-        Player_Model,
-        func.sum(Series_Players_Model.TotalPoints).label('TotalPoints')
-    ).join(Series_Players_Model, Series_Players_Model.PlayerID == Player_Model.PlayerID) \
-    .join(Series_Model, Series_Players_Model.SeriesID == Series_Model.SeriesID) \
-    .filter(Series_Model.ChampionshipID == championship_id) \
-    .group_by(Player_Model.PlayerID) \
-    .order_by(desc('TotalPoints')).all()
+    try:
+        # Fetch and aggregate results across all series for the championship
+        overall_results = db.session.query(
+            Player_Model,
+            func.sum(Series_Players_Model.TotalPoints).label('TotalPoints')
+        ).join(Series_Players_Model, Series_Players_Model.PlayerID == Player_Model.PlayerID) \
+        .join(Series_Model, Series_Players_Model.SeriesID == Series_Model.SeriesID) \
+        .filter(Series_Model.ChampionshipID == championship_id) \
+        .group_by(Player_Model.PlayerID) \
+        .order_by(desc('TotalPoints')).all()
 
-    return overall_results
+        return overall_results
+
+    except SQLAlchemyError as e:
+        # Handle any database-related errors
+        db.session.rollback()  # Rollback the session to avoid partial commits
+        print(f"Database error: {str(e)}")
+        return jsonify({"error": "An error occurred while fetching the overall results."}), 500
+
+    except Exception as e:
+        # Handle any other unexpected errors
+        print(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "An unexpected error occurred."}), 500
+
+def get_players_overall_points(championship_id):
+# Get all series for the championship
+    series_list = Series_Model.select_series(championship_id=championship_id)
+
+    # Sort series by SeriesID (ascending)
+    series_list = sorted(series_list, key=lambda x: x.SeriesID)
+
+    # Aggregate player points across all series
+    player_points = {}
+
+    for series in series_list:
+        players_ordered_by_points = Series_Players_Model.select_series_players_ordered_by_total_points(series.SeriesID)
+
+        for player in players_ordered_by_points:
+            if player.PlayerID not in player_points:
+                player_info = Player_Model.query.filter_by(PlayerID=player.PlayerID).first()
+                player_points[player.PlayerID] = {
+                    'player_name': player_info.name,
+                    'player_id': player.PlayerID,
+                    'total_points': 0,
+                    'series_points': {}
+                }
+            player_points[player.PlayerID]['total_points'] += player.TotalPoints
+            player_points[player.PlayerID]['series_points'][series.SeriesID] = player.TotalPoints
+
+    return player_points
 

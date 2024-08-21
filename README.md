@@ -45,6 +45,11 @@ cd <your_repository>
 ```bash
 docker build -t manager_v3 .
 ```
+or if using docker-compose.yml:
+```bash
+docker-compose up --build
+```
+
 3. Run the Docker container:
 ```bash
 docker run -p 5000:5000 manager_v3

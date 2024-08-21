@@ -29,14 +29,8 @@ ENV FLASK_ENV=development
 # Copy the contents of the project into the container's /app directory
 COPY . /
 
-# Copy the start script into the container
-COPY start.sh /start.sh
-
-# Make the start script executable
-RUN chmod +x /start.sh
-
 # Expose the port that the app runs on
 EXPOSE 5000
 
-# Start both ngrok and Flask using the start script
-CMD ["/start.sh"]
+# Start ngrok and the Flask app concurrently
+CMD ngrok http 5000 --log stdout & python app/run.py

@@ -10,6 +10,7 @@ from io import StringIO
 
 from app.models.team_members_model import Team_Members_Model
 from app.models.teams_model import Teams_Model
+from app.services.series_players_service import get_players_overall_points
 
 # Create a Blueprint for series routes
 results_bp = Blueprint('results_bp', __name__)
@@ -117,30 +118,11 @@ def get_championship_rank():
         if not championship_id:
             return jsonify(success=False, error="championship_id is required"), 400
 
-        # Get all series for the championship
-        series_list = Series_Model.select_series(championship_id=championship_id)
-        
+        # Get player points using the refactored method
+        player_points = get_players_overall_points(championship_id)
+
         # Sort series by SeriesID (ascending)
-        series_list = sorted(series_list, key=lambda x: x.SeriesID)
-
-        # Aggregate player points across all series
-        player_points = {}
-        series_ids = [series.SeriesID for series in series_list]
-
-        for series in series_list:
-            players_ordered_by_points = Series_Players_Model.select_series_players_ordered_by_total_points(series.SeriesID)
-
-            for player in players_ordered_by_points:
-                if player.PlayerID not in player_points:
-                    player_info = Player_Model.query.filter_by(PlayerID=player.PlayerID).first()
-                    player_points[player.PlayerID] = {
-                        'player_name': player_info.name,
-                        'player_id': player.PlayerID,
-                        'total_points': 0,
-                        'series_points': {}
-                    }
-                player_points[player.PlayerID]['total_points'] += player.TotalPoints
-                player_points[player.PlayerID]['series_points'][series.SeriesID] = player.TotalPoints
+        series_ids = sorted(player_points[next(iter(player_points))]['series_points'].keys())
 
         # Create CSV file
         csv_file = StringIO()
@@ -167,8 +149,7 @@ def get_championship_rank():
         return jsonify(success=True, data=result)
 
     except Exception as e:
-        return jsonify(success=False, error=str(e)), 500
-    
+        return jsonify(success=False, error=str(e)), 500   
 @results_bp.route('/check_series_player_records', methods=['GET'])
 def check_series_player_records():
     try:
@@ -320,6 +301,7 @@ def get_teams_results():
 
     except Exception as e:
         return jsonify(success=False, error=str(e)), 500
+    
 
 def init_routes(app):
     app.register_blueprint(results_bp)
