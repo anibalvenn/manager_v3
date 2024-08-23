@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template
+from flask_login import login_required
 from app import db
 from app.models import Team_Members_Model, Teams_Model
 
@@ -7,6 +8,7 @@ team_player_bp = Blueprint('team_player_bp', __name__)
 
 
 @team_player_bp.route('/add_players_to_team', methods=['POST'])
+@login_required
 def add_players_to_team():
     data = request.json
     players = data.get('players', [])      
@@ -38,6 +40,7 @@ def add_players_to_team():
 
 
 @team_player_bp.route('/get_players_by_team/<int:team_id>', methods=['GET'])
+@login_required
 def get_players_by_team(team_id):
     players = Team_Members_Model.select_team_members(team_id==team_id)
     if players:
@@ -47,6 +50,7 @@ def get_players_by_team(team_id):
         return jsonify({'error': 'No players found for this championship'}), 404
     
 @team_player_bp.route('/remove_all_players_from_team', methods=['DELETE'])
+@login_required
 def remove_all_players_from_team():
     data = request.json
     team_id = data.get('teamId')
@@ -67,6 +71,7 @@ def remove_all_players_from_team():
         return jsonify({'message': 'No players found for the specified team. No action required.'}), 200
 
 @team_player_bp.route('/delete_team/<int:team_id>', methods=['DELETE'])
+@login_required
 def delete_team(team_id):
     # Wrap operations in a transaction
     try:
@@ -94,6 +99,7 @@ def delete_team(team_id):
         return jsonify({'message': f'Error deleting team or players: {str(e)}'}), 500
     
 @team_player_bp.route('/update_team_name', methods=['PUT'])
+@login_required
 def update_team_name():
     # Retrieve data from the request body
     data = request.json
@@ -131,6 +137,7 @@ def update_team_name():
     
 # Add more routes for championship management as needed
 @team_player_bp.route('/get_teams/<int:championship_id>', methods=['GET'])
+@login_required
 def get_teams(championship_id):
     teams = Teams_Model.select_team(championship_id=championship_id)
     print('teams',teams)

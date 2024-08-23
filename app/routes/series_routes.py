@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
+from flask_login import login_required
 from app import db
 from app.models import Series_Model
 from app.models.series_player_model import Series_Players_Model
@@ -13,6 +14,7 @@ series_bp = Blueprint('series_bp', __name__)
 
 # Define routes for series management
 @series_bp.route('/build_all_random_series', methods=['POST'])
+@login_required
 def build_all_random_series():
     data = request.json
 
@@ -41,6 +43,7 @@ def build_all_random_series():
 
 # Define routes for series management
 @series_bp.route('/add_ranked_series', methods=['POST'])
+@login_required
 def add_ranked_series():
     data = request.json
 
@@ -65,6 +68,7 @@ def add_ranked_series():
     return jsonify({'message': 'series added successfully'}), 201
 
 @series_bp.route('/get_serien/<int:championship_id>', methods=['GET'])
+@login_required
 def get_serien(championship_id):
     serien = Series_Model.select_series(championship_id=championship_id)
     serien_data = [{'serieID': serie.SeriesID, 'serieName': serie.series_name,
@@ -73,6 +77,7 @@ def get_serien(championship_id):
     return jsonify(serien_data)
 
 @series_bp.route('/delete_serie/<int:serie_id>', methods=['DELETE'])
+@login_required
 def delete_serie(serie_id):
     # Wrap operations in a transaction
     try:

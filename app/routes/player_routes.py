@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app import db
 from app.models import Player_Model
 
@@ -9,6 +9,7 @@ player_bp = Blueprint('player_bp', __name__)
 
 # Define routes for player management
 @player_bp.route('/add_player', methods=['POST'])
+@login_required
 def add_player():
     data = request.json
 
@@ -30,6 +31,7 @@ def add_player():
 
 # Add more routes for player management as needed
 @player_bp.route('/select_player', methods=['GET'])
+@login_required
 def select_player():
     
     players = Player_Model.select_user_players(current_user.id)
@@ -38,6 +40,7 @@ def select_player():
     return jsonify(player_data)
 
 @player_bp.route('/update_player/<int:player_id>', methods=['PUT'])
+@login_required
 def update_player(player_id):
     data = request.json
     
@@ -55,6 +58,7 @@ def update_player(player_id):
         return jsonify({'error': 'Player not found'}), 404
 
 @player_bp.route('/delete_player/<int:player_id>', methods=['DELETE'])
+@login_required
 def delete_player(player_id):
     deleted = Player_Model.delete_player(player_id)
     

@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template
+from flask_login import login_required
 from app import db
 from app.models import Championship_Player_Model
 from app.services import championship_players_service
@@ -7,6 +8,7 @@ from app.services import championship_players_service
 championship_player_bp = Blueprint('championship_player_bp', __name__)
 
 @championship_player_bp.route('/add_player_to_championship', methods=['POST'])
+@login_required
 def add_player_to_championship():
     data = request.json
     player_id = data.get('playerId')
@@ -24,6 +26,7 @@ def add_player_to_championship():
         return jsonify({'error': 'Missing required data'}), 400
     
 @championship_player_bp.route('/add_players_to_championship', methods=['POST'])
+@login_required
 def add_players_to_championship():
     data = request.json
     players = data.get('players', [])    
@@ -50,6 +53,7 @@ def add_players_to_championship():
         return jsonify({'message': 'No players were added to the championship'}), 200
 
 @championship_player_bp.route('/remove_player_from_championship', methods=['DELETE'])
+@login_required
 def remove_player_from_championship():
     data = request.json
     player_id = data.get('playerId')
@@ -65,6 +69,7 @@ def remove_player_from_championship():
         return jsonify({'error': 'Missing required data'}), 400
 
 @championship_player_bp.route('/get_players_by_championship/<int:championship_id>', methods=['GET'])
+@login_required
 def get_players_by_championship(championship_id):
     players = Championship_Player_Model.select_championship_players_by_championship_id(championship_id=championship_id)
     if players:
@@ -74,6 +79,7 @@ def get_players_by_championship(championship_id):
         return jsonify({'error': 'No players found for this championship'}), 404
     
 @championship_player_bp.route('/remove_all_players_from_championship', methods=['DELETE'])
+@login_required
 def remove_all_players_from_championship():
     data = request.json
     championship_id = data.get('championshipId')

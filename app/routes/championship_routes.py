@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app import db
 from app.models import Championship_Model
 
@@ -9,6 +9,7 @@ championship_bp = Blueprint('championship_bp', __name__)
 
 # Define routes for championship management
 @championship_bp.route('/add_championship', methods=['POST'])
+@login_required
 def add_championship():
     data = request.json
 
@@ -34,6 +35,7 @@ def add_championship():
 
 # Add more routes for championship management as needed
 @championship_bp.route('/get_championships', methods=['GET'])
+@login_required
 def get_championships():
     championships = Championship_Model.select_user_championships()
     championship_data = [{'championshipID': champ.ChampionshipID, 'name': champ.name, 'start_date': champ.creation_date.strftime('%Y-%m-%d'), 'acronym': champ.acronym} for champ in championships]
@@ -41,6 +43,7 @@ def get_championships():
 
 
 @championship_bp.route('/delete_championship/<int:championship_id>', methods=['DELETE'])
+@login_required
 def delete_championship(championship_id):
     print(championship_id)
     # Attempt to delete the championship with the provided ID from the database
@@ -50,6 +53,7 @@ def delete_championship(championship_id):
         return jsonify({'message': 'Failed to remove championship'}), 404
 
 @championship_bp.route('/update_championship/<int:championship_id>', methods=['POST'])
+@login_required
 def update_championship(championship_id):
     data = request.json
 
@@ -70,3 +74,4 @@ def update_championship(championship_id):
 
 def init_routes(app):
     app.register_blueprint(championship_bp)
+

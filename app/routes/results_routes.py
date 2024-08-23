@@ -1,5 +1,6 @@
 import datetime
 from flask import Blueprint, request, jsonify, send_file
+from flask_login import login_required
 from app import db
 from app.models.championship_model import Championship_Model
 from app.models.player_model import Player_Model
@@ -16,6 +17,7 @@ from app.services.series_players_service import get_players_overall_points
 results_bp = Blueprint('results_bp', __name__)
 
 @results_bp.route('/update_player_points', methods=['POST'])
+@login_required
 def update_player_points():
     try:
         data = request.get_json()
@@ -61,6 +63,7 @@ def update_player_points():
         return jsonify(success=False, error=str(e)), 500
  
 @results_bp.route('/api/get_series_rank', methods=['GET'])
+@login_required
 def get_series_rank():
     try:
         # Get the series_id from query parameters
@@ -90,6 +93,7 @@ def get_series_rank():
         return jsonify(success=False, error=str(e)), 500
 
 @results_bp.route('/api/check_series', methods=['GET'])
+@login_required
 def check_series():
     championship_id = request.args.get('championship_id')
     selected_series_id = request.args.get('selected_series_id')
@@ -109,6 +113,7 @@ def check_series_in_championship(championship_id, selected_series_id):
 
 
 @results_bp.route('/api/get_championship_rank', methods=['GET'])
+@login_required
 def get_championship_rank():
     try:
         # Get the championship_id from query parameters
@@ -151,6 +156,7 @@ def get_championship_rank():
     except Exception as e:
         return jsonify(success=False, error=str(e)), 500   
 @results_bp.route('/check_series_player_records', methods=['GET'])
+@login_required
 def check_series_player_records():
     try:
         series_id = request.args.get('series_id')
@@ -168,6 +174,7 @@ def check_series_player_records():
         return jsonify(success=False, error=str(e)), 500
     
 @results_bp.route('/api/import_series_results', methods=['POST'])
+@login_required
 def import_series_results():
     try:
         data = request.json
@@ -202,6 +209,7 @@ def import_series_results():
 
 
 @results_bp.route('/api/import_single_series_results', methods=['POST'])
+@login_required
 def import_single_series_results():
     try:
         data = request.json
@@ -234,6 +242,7 @@ def import_single_series_results():
 
 
 @results_bp.route('/api/get_teams_results', methods=['POST'])
+@login_required
 def get_teams_results():
     try:
         data = request.json

@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_login import login_required
 from app import db
 from app.models.championship_player_model import Championship_Player_Model
 from app.models.player_model import Player_Model
@@ -10,7 +11,9 @@ from app.models.tische_model import Tische_Model
 tische_bp = Blueprint('tische_bp', __name__)
 
 @tische_bp.route('/get_serie_tische/<int:serie_id>', methods=['GET'])
+@login_required
 def get_serie_tische(serie_id):
+
     tische = Tische_Model.query.filter_by(SeriesID=serie_id).all()
     
     tische_data = []
@@ -35,6 +38,7 @@ def get_serie_tische(serie_id):
     return jsonify(tische_data)
 
 @tische_bp.route('/build_edited_tische', methods=['POST'])
+@login_required
 def build_edited_tische():
     try:
         request_data = request.get_json()
@@ -63,6 +67,7 @@ def build_edited_tische():
    
 
 @tische_bp.route('/check_existing_tische', methods=['GET'])
+@login_required
 def check_existing_tische():
     try:
         series_id = request.args.get('series_id')
@@ -81,6 +86,7 @@ def check_existing_tische():
 
 
 @tische_bp.route('/delete_existing_tische', methods=['DELETE'])
+@login_required
 def delete_existing_tische():
     try:
         series_id = request.args.get('series_id')
@@ -101,6 +107,7 @@ def delete_existing_tische():
 
 
 @tische_bp.route('/get_player_tisch_positions/<int:championship_id>', methods=['GET'])
+@login_required
 def get_player_tisch_positions(championship_id):
     try:
         # Step 1: Get all series for the given championship ID
