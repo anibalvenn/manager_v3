@@ -1,6 +1,8 @@
 from app import db
 from datetime import date
 from sqlalchemy import desc
+from flask_login import current_user
+
 
 class Championship_Model(db.Model):
     __tablename__ = 'championships'
@@ -8,12 +10,23 @@ class Championship_Model(db.Model):
     name = db.Column(db.Text, nullable=False)
     acronym = db.Column(db.Text, nullable=False)
     creation_date = db.Column(db.Date, nullable=False, default=date.today)  # Adding creation_date field
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to the User table
+
+
+    @classmethod
+    def select_user_championships(cls,):
+        return cls.query.filter_by(user_id=current_user.id).all()
+    
+    @classmethod
+    def user_owns_championship(cls, championship_id, user_id):
+        return cls.query.filter_by(ChampionshipID=championship_id, user_id=user_id).first() is not None
+
 
     @classmethod
     def insert_championship(cls, name, acronym, creation_date=date.today()):
         """Inserts a new championship into the database."""
-        # You can either pass creation_date explicitly or let it default to today's date
-        new_championship = cls(name=name, acronym=acronym, creation_date=creation_date)
+        # Include the current user's ID in the new championship record
+        new_championship = cls(name=name, acronym=acronym, creation_date=creation_date, user_id=current_user.id)
         db.session.add(new_championship)
         db.session.commit()
         return new_championship

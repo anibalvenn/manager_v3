@@ -1,6 +1,8 @@
 from app import db
 from datetime import date
 from sqlalchemy import desc
+from flask_login import current_user
+
 
 class Player_Model(db.Model):
     __tablename__ = 'players'
@@ -9,11 +11,18 @@ class Player_Model(db.Model):
     sex = db.Column(db.Text, nullable=False)
     birthdate = db.Column(db.Date, nullable=False)
     country = db.Column(db.Text, nullable=False)  # Adding country field
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to the User table
+
+    @classmethod
+    def select_user_players(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).all()
+
 
     @classmethod
     def insert_player(cls, name, sex, birthdate, country):
         """Inserts a new player into the database."""
-        new_player = cls(name=name, sex=sex, birthdate=birthdate, country=country)
+        # Include the current user's ID in the new player record
+        new_player = cls(name=name, sex=sex, birthdate=birthdate, country=country, user_id=current_user.id)
         db.session.add(new_player)
         db.session.commit()
         return new_player

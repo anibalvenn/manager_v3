@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
+from flask_login import current_user
 from app import db
 from app.models import Player_Model
 
@@ -19,7 +20,7 @@ def add_player():
     player_country = data.get('playerCountry')
 
     # Create a new player object
-    new_player = Player_Model(name=player_name, birthdate=player_birth, sex=player_sex, country=player_country)
+    new_player = Player_Model(name=player_name, birthdate=player_birth, sex=player_sex, country=player_country, user_id= current_user.id)
 
     # Add the new player to the database session
     db.session.add(new_player)
@@ -30,13 +31,8 @@ def add_player():
 # Add more routes for player management as needed
 @player_bp.route('/select_player', methods=['GET'])
 def select_player():
-    player_id = request.args.get('player_id')
-    name = request.args.get('name')
-    sex = request.args.get('sex')
-    birthdate = request.args.get('birthdate')
-    country = request.args.get('country')
     
-    players = Player_Model.select_player(player_id=player_id, name=name, sex=sex, birthdate=birthdate, country=country)
+    players = Player_Model.select_user_players(current_user.id)
     player_data = [{'PlayerID': player.PlayerID, 'name': player.name, 'sex': player.sex, 'birthdate': player.birthdate.strftime('%Y-%m-%d'), 'country': player.country} for player in players]
     
     return jsonify(player_data)

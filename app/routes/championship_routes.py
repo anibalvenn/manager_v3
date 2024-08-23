@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
+from flask_login import current_user
 from app import db
 from app.models import Championship_Model
 
@@ -14,22 +15,27 @@ def add_championship():
     # Extract data from the request
     championship_name = data.get('championshipName')
     championship_creation_str = data.get('championshipStart')  # Get date string from request
-    championship_cretion_date = datetime.strptime(championship_creation_str, '%Y-%m-%d').date()  # Convert to Python date object
+    championship_creation_date = datetime.strptime(championship_creation_str, '%Y-%m-%d').date()  # Convert to Python date object
     championship_acronym = data.get('championshipAcronym')
 
-    # Create a new championship object
-    new_championship = Championship_Model(name=championship_name,acronym=championship_acronym,creation_date=championship_cretion_date )
+    # Create a new championship object, including the current user's ID
+    new_championship = Championship_Model(
+        name=championship_name,
+        acronym=championship_acronym,
+        creation_date=championship_creation_date,
+        user_id=current_user.id  # Associate the championship with the current user
+    )
 
     # Add the new championship to the database session
     db.session.add(new_championship)
     db.session.commit()
 
-    return jsonify({'message': 'championship added successfully'}), 201
+    return jsonify({'message': 'Championship added successfully'}), 201
 
 # Add more routes for championship management as needed
 @championship_bp.route('/get_championships', methods=['GET'])
 def get_championships():
-    championships = Championship_Model.select_championship()
+    championships = Championship_Model.select_user_championships()
     championship_data = [{'championshipID': champ.ChampionshipID, 'name': champ.name, 'start_date': champ.creation_date.strftime('%Y-%m-%d'), 'acronym': champ.acronym} for champ in championships]
     return jsonify(championship_data)
 
