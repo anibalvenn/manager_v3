@@ -110,17 +110,21 @@ def delete_existing_tische():
 @login_required
 def get_player_tisch_positions(championship_id):
     try:
-        # Step 1: Get all series for the given championship ID
-        series_list = Series_Model.select_series(championship_id=championship_id, is_random=True)
+        # Step 1: Get all random series for the given championship ID
+        random_series_list = Series_Model.select_series(championship_id=championship_id, is_random=True)
 
-        # Step 2: Get all players enrolled in the given championship
+        # Step 2: Get non-random series and calculate their count
+        non_random_series_list = Series_Model.select_series(championship_id=championship_id, is_random=False)
+        non_random_series_count = len(non_random_series_list)
+
+        # Step 3: Get all players enrolled in the given championship
         players_list = Championship_Player_Model.select_championship_player(championship_id=championship_id)
 
         # Initialize a dictionary to store the results
         results = {}
 
-        # Step 3: Get the tisch and position for each player in each series
-        for series in series_list:
+        # Step 4: Get the tisch and position for each player in each random series
+        for series in random_series_list:
             series_id = series.SeriesID
             series_name = series.series_name
 
@@ -129,13 +133,11 @@ def get_player_tisch_positions(championship_id):
 
             for player in players_list:
                 player_id = player.PlayerID
-
-                # Query to get player name
                 player_info = Player_Model.select_player(player_id=player_id)
                 player_name = player_info.name if player_info else 'Unknown'
 
-                # Check each tisch for the player's position
                 for tisch in tische_list:
+                    position = ''
                     if tisch.PosA == player_id:
                         position = 'A'
                     elif tisch.PosB == player_id:
@@ -144,20 +146,21 @@ def get_player_tisch_positions(championship_id):
                         position = 'C'
                     elif tisch.PosD == player_id:
                         position = 'D'
-                    else:
-                        continue  # Skip if the player is not in this tisch
 
-                    # Store the result
-                    if player_id not in results:
-                        results[player_id] = []
-                    results[player_id].append({
-                        'series_id': series_id,
-                        'series_name': series_name,
-                        'tisch_id': tisch.TischID,
-                        'tisch_name': tisch.tisch_name,
-                        'position': position,
-                        'player_name': player_name
-                    })
+                    if position:  # Only add if the player is found in this tisch
+                        if player_id not in results:
+                            results[player_id] = {
+                                'player_name': player_name,
+                                'ranked_series_count': non_random_series_count,  # Include the count here
+                                'positions': []
+                            }
+                        results[player_id]['positions'].append({
+                            'series_id': series_id,
+                            'series_name': series_name,
+                            'tisch_id': tisch.TischID,
+                            'tisch_name': tisch.tisch_name,
+                            'position': position
+                        })
 
         return jsonify(success=True, data=results), 200
     except Exception as e:

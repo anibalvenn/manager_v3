@@ -20,4 +20,4 @@ def set_initial_values_to_players_into_series(championship_id, series):
 
     # Insert each player into the Series_Players_Model with TotalPoints set to 0
     for player_id in playerIDsArray:
-        Series_Players_Model.insert_series_player_record(series_id=series_id, player_id=player_id, total_points=0)
+        Series_Players_Model.insert_series_player_record(series_id=series_id, player_id=player_id, total_points=0,lost_games=0)

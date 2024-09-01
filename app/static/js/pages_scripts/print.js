@@ -54,6 +54,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Get the championship data from the row
     generatePlayerZettelPDF(currentChampionshipID)
   });
+  const btnPrintLostGamesList = document.getElementById('btnPrintLostGamesList');
+  btnPrintLostGamesList.addEventListener('click', () => {
+    // Get the championship data from the row
+    generatePDFLostGamesList(currentChampionshipID)
+  });
 
   async function generatePDFSeriesResult() {
     if (!currentSerieID) {
@@ -529,18 +534,18 @@ document.addEventListener('DOMContentLoaded', function () {
       alert("No series ID found in local storage");
       return;
     }
-  
+
     try {
       const response = await fetch(`/get_serie_tische/${currentSerieID}`);
       if (!response.ok) {
         throw new Error('Network response was not ok ' + response.statusText);
       }
-  
+
       const tische = await response.json();
-  
+
       const { PDFDocument } = PDFLib;
       const pdfDoc = await PDFDocument.create();
-  
+
       for (const tisch of tische) {
         const positions = [
           { pos: 'PosA', name: tisch.namePosA, id: tisch.idPosA },
@@ -548,14 +553,14 @@ document.addEventListener('DOMContentLoaded', function () {
           { pos: 'PosC', name: tisch.namePosC, id: tisch.idPosC },
           { pos: 'PosD', name: tisch.namePosD, id: tisch.idPosD }
         ];
-  
+
         const validPositions = positions.filter(position => position.id > 0);
         const numPlayers = validPositions.length;
-  
+
         if (numPlayers !== 3 && numPlayers !== 4) {
           continue; // Skip if the number of players is not 3 or 4
         }
-  
+
         const page = pdfDoc.addPage([595.28, 841.89]); // A4 size in points
         const { width, height } = page.getSize();
         const tischName = tisch.tischName;
@@ -563,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const tischLabel = labels.tischLabel;
         const seriesLabel = labels.seriesLabel;
         const todayDate = getCurrentDateFormatted();
-  
+
         if (numPlayers === 4) {
           page.drawText(`${tisch.tischName}`, { x: 60, y: height - 46, size: 12 });
           page.drawText(`${todayDate}`, { x: 305, y: height - 45, size: 12 });
@@ -580,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function () {
           page.drawText(`${tisch.idPosC}`, { x: 405, y: height - 112, size: 14 });
           page.drawText(`${tisch.idPosD}`, { x: 489, y: height - 112, size: 14 });
         }
-  
+
         if (numPlayers === 3) {
           page.drawText(`${tisch.tischName}`, { x: 70, y: height - 47, size: 12 });
           page.drawText(`${todayDate}`, { x: 290, y: height - 47, size: 12 });
@@ -588,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function () {
           page.drawText(`${tischLabel}`, { x: 525, y: height - 47, size: 20 });
           page.drawText(`, T_ID: ${tisch.tischID}`, { x: 560, y: height - 45, size: 6 });
           // Customize the template page with the tisch and player data
-  
+
           if (tisch.idPosA === -1) {
             page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 251, y: height - 83, size: 10 });
             page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 351, y: height - 83, size: 10 });
@@ -620,9 +625,9 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
       }
-  
+
       const pdfBytes = await pdfDoc.save();
-  
+
       // Trigger download of the PDF
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
@@ -992,6 +997,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const result = await response.json();
 
       if (result.success) {
+        console.log(result.data)
         return result.data;
       } else {
         alert('Error fetching player tisch positions: ' + result.error);
@@ -1003,40 +1009,80 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   async function generatePlayerTischPositionsPDF(championshipId) {
-    const data = await fetchPlayerTischPositions(championshipId);
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-  
-    doc.setFontSize(18);
-    doc.text(`Championship ID: ${championshipId}`, 14, 15);
-  
-    Object.keys(data).forEach((playerId, index) => {
-      if (index > 0) {
-        doc.addPage();
-      }
-  
-      const player = data[playerId][0];
-      const playerName = player.player_name;
-  
-      doc.setFontSize(14);
-      doc.text(`Player Name: ${playerName} (ID: ${playerId})`, 14, 25);
-  
-      const headers = [['Series Name', 'Tisch Name', 'Position']];
-      const body = data[playerId].map(item => [item.series_name, item.tisch_name, item.position]);
-  
-      doc.autoTable({
-        head: headers,
-        body: body,
-        startY: 30,
-        theme: 'grid',
-        headStyles: { fillColor: [211, 211, 211] },
-        footStyles: { fillColor: [211, 211, 211] }
+    const response = await fetch(`/get_player_tisch_positions/${championshipId}`);
+    const result = await response.json();
+
+    if (result.success) {
+      const data = result.data;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(18);
+      doc.text(`Championship ID: ${championshipId}`, 14, 15);
+
+      Object.keys(data).forEach((playerId, index) => {
+        if (index > 0) {
+          doc.addPage();
+        }
+
+        let lastSeriesChar = '';
+        const player = data[playerId];
+        const playerName = player.player_name;
+        const rankedSeriesCount = player.ranked_series_count; // Retrieve the ranked_series_count for each player
+
+        doc.setFontSize(14);
+        doc.text(`${playerName},  #${playerId}`, 14, 25);
+
+        // Update headers to include new columns
+        const headers = [['Serie', 'Tisch', 'Position', 'Gew', 'Verl', 'Serie Punkte', 'Total']];
+
+        const body = player.positions.map(item => {
+          // Update lastSeriesChar with the last character of the current series_name
+          lastSeriesChar = item.series_name.slice(-1);
+          // Placeholder values for the new columns, adjust as necessary
+          return [
+            `Serie ${lastSeriesChar}`,
+            `Tisch ${item.tisch_name.slice(-1)}`,
+            item.position,
+            '',  // Serie Punkte
+            '',  // Gew
+            '',  // Verl
+            ''   // Total
+          ];
+        });
+
+        // Add empty rows for non-random series based on ranked_series_count
+        for (let i = 0; i < rankedSeriesCount; i++) {
+          body.push([
+            `Serie ${parseInt(lastSeriesChar) + i + 1}`,
+            '',  // Tisch Name
+            '',  // Position
+            '',  // Serie Punkte
+            '',  // Gew
+            '',  // Verl
+            ''   // Total
+          ]);
+        }
+
+        doc.autoTable({
+          head: headers,
+          body: body,
+          startY: 30,
+          theme: 'grid',
+          headStyles: { fillColor: [211, 211, 211] },
+          footStyles: { fillColor: [211, 211, 211] }
+        });
       });
-    });
-  
-    doc.save(`Player_Tisch_Positions_${championshipId}.pdf`);
+
+      doc.save(`Player_Tisch_Positions_${championshipId}.pdf`);
+    } else {
+      console.error('Error fetching player tisch positions:', result.error);
+      alert('Failed to fetch player tisch positions');
+    }
   }
-  
+
+
+
   function generatePlayerZettelPDF(championshipId) {
 
     if (championshipId) {
@@ -1046,6 +1092,112 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  async function generatePDFLostGamesList() {
+    let currentChampionshipID = localStorage.getItem('currentChampionshipID');
+  
+    if (!currentChampionshipID) {
+      alert("No championship ID found in local storage");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`/api/get_lost_games_list?championship_id=${currentChampionshipID}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+  
+      const data = await response.json();
+      if (!data.success) {
+        console.error('Error:', data.error);
+        return;
+      }
+  
+      const results = data.data;
+      results.sort((a, b) => a.player_name.localeCompare(b.player_name));
+  
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+  
+      // Center the main title
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const title = "Lost Games List";
+      const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
+      doc.setFontSize(18);
+      doc.text(title, titleX, 20);
+  
+      // Add the championship ID below the main title
+      doc.setFontSize(10);
+      const championshipInfo = `Championship ID: ${currentChampionshipID}`;
+      const championshipInfoX = (pageWidth - doc.getTextWidth(championshipInfo)) / 2;
+      doc.text(championshipInfo, championshipInfoX, 26);
+  
+      // Determine the number of series by examining the first player's series_lost_games length
+      const seriesCount = Object.keys(results[0].series_lost_games).length;
+      const headers = ['Player Name'];
+      for (let i = 1; i <= seriesCount; i++) {
+        headers.push(`S_${i}`);
+      }
+      headers.push('Total');
+  
+      const tableRows = [];
+      const seriesTotals = Array(seriesCount + 1).fill(0); // Array to store totals for each series and total column
+  
+      results.forEach(player => {
+        const row = [player.player_name];
+        Object.keys(player.series_lost_games).forEach((key, index) => {
+          const gameCount = player.series_lost_games[key];
+          seriesTotals[index] += gameCount; // Sum each series for the footer
+          row.push(gameCount);
+        });
+        const totalLostGames = player.total_lost_games;
+        seriesTotals[seriesCount] += totalLostGames; // Sum the total lost games
+        row.push(totalLostGames);
+        tableRows.push(row);
+      });
+  
+      // Add footer row
+      const footerRow = ['Total per Serie'];
+      seriesTotals.forEach(total => footerRow.push(total));
+  
+      // AutoTable plugin to generate table
+      doc.autoTable({
+        head: [headers],
+        body: tableRows,
+        foot: [footerRow], // Append the footer row to the table data
+        startY: 30, // Adjust startY to move the table down
+        theme: 'grid',
+        styles: {
+          cellPadding: 1, // Decrease the cell padding to reduce row height
+          fontSize: 10,
+          valign: 'middle', // Change to middle to vertically center the content
+          halign: 'left'
+        },
+        columnStyles: {
+          0: { cellWidth: '20%' }, // Player Name column
+          ...Object.fromEntries([...Array(seriesCount).keys()].map(i => [i + 1, { cellWidth: '10%' }])),
+          [1 + seriesCount]: { cellWidth: '10%' } // Total column
+        },
+        headStyles: {
+          fillColor: [211, 211, 211], // Gray background for the header
+          textColor: [0, 0, 0], // Text color black
+          fontStyle: 'bold' // Bold text for the header
+        },
+        footStyles: {
+          fillColor: [211, 211, 211], // Match the header background
+          textColor: [0, 0, 0], // Match the header text color
+          fontStyle: 'bold' // Match the header font style
+        }
+      });
+  
+      doc.save(`Lost_Games_List_Championship_${currentChampionshipID}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF');
+    }
+  }
+  
+  
+  
 
 
 })

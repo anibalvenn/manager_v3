@@ -8,10 +8,9 @@ from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
 import csv
 from io import StringIO
-
 from app.models.team_members_model import Team_Members_Model
 from app.models.teams_model import Teams_Model
-from app.services.series_players_service import get_players_overall_points
+from app.services.series_players_service import get_lost_games_service, get_players_overall_points
 
 # Create a Blueprint for series routes
 results_bp = Blueprint('results_bp', __name__)
@@ -154,7 +153,30 @@ def get_championship_rank():
         return jsonify(success=True, data=result)
 
     except Exception as e:
+        return jsonify(success=False, error=str(e)), 500 
+      
+@results_bp.route('/api/get_lost_games_list', methods=['GET'])
+@login_required
+def get_lost_games_list():
+    try:
+        # Get the championship_id from query parameters
+        championship_id = request.args.get('championship_id')
+
+        # Ensure championship_id is provided
+        if not championship_id:
+            return jsonify(success=False, error="championship_id is required"), 400
+
+        # Get player points using the refactored method
+        lost_games_list = get_lost_games_service(championship_id)
+        print('172',championship_id)
+
+        # Prepare the JSON result
+        result = sorted(lost_games_list.values(), key=lambda x: x['total_lost_games'], reverse=True)
+        return jsonify(success=True, data=result)
+
+    except Exception as e:
         return jsonify(success=False, error=str(e)), 500   
+
 @results_bp.route('/check_series_player_records', methods=['GET'])
 @login_required
 def check_series_player_records():

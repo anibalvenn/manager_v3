@@ -124,3 +124,30 @@ def get_players_overall_points(championship_id):
 
     return player_points
 
+def get_lost_games_service(championship_id):
+# Get all series for the championship
+    series_list = Series_Model.select_series(championship_id=championship_id)
+
+    # Sort series by SeriesID (ascending)
+    series_list = sorted(series_list, key=lambda x: x.SeriesID)
+
+    # Aggregate player points across all series
+    lost_games_list = {}
+
+    for series in series_list:
+        series_players_data = Series_Players_Model.select_series_player_records(series.SeriesID)
+
+        for player in series_players_data:
+            if player.PlayerID not in lost_games_list:
+                player_info = Player_Model.query.filter_by(PlayerID=player.PlayerID).first()
+                lost_games_list[player.PlayerID] = {
+                    'player_name': player_info.name,
+                    'player_id': player.PlayerID,
+                    'total_lost_games': 0,
+                    'series_lost_games': {}
+                }
+            lost_games_list[player.PlayerID]['total_lost_games'] += player.LostGames
+            lost_games_list[player.PlayerID]['series_lost_games'][series.SeriesID] = player.LostGames
+
+    return lost_games_list
+ 
