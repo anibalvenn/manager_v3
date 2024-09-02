@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Get the championship data from the row
     generatePDFOverallResults()
   });
+  const btnPrintFrauenResults = document.getElementById('btnPrintFrauenResults');
+  btnPrintFrauenResults.addEventListener('click', () => {
+    // Get the championship data from the row
+    generateFrauenResults()
+  });
 
   const btnPrintCurrentSeriesListen = document.getElementById('btnPrintCurrentSeriesListen');
   btnPrintCurrentSeriesListen.addEventListener('click', () => {
@@ -393,6 +398,101 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       doc.save(`Overall_Results_Championship_${currentChampionshipID}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF');
+    }
+  }
+  async function generateFrauenResults() {
+    let currentChampionshipID = localStorage.getItem('currentChampionshipID');
+
+    if (!currentChampionshipID) {
+      alert("No championship ID found in local storage");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/get_frauen_rank?championship_id=${currentChampionshipID}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        console.error('Error:', data.error);
+        return;
+      }
+
+      const results = data.data;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Center the main title
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const title = "Female Results";
+      const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
+      doc.setFontSize(18);
+      doc.text(title, titleX, 20);
+
+      // Add the championship ID below the main title
+      doc.setFontSize(10);
+      const championshipInfo = `Championship ID: ${currentChampionshipID}`;
+      const championshipInfoX = (pageWidth - doc.getTextWidth(championshipInfo)) / 2;
+      doc.text(championshipInfo, championshipInfoX, 26);
+
+      // Prepare table data
+      const headers = ['Rank', 'Player Name'];
+      const seriesCount = Object.keys(results[0].series_points).length;
+      for (let i = 1; i <= seriesCount; i++) {
+        headers.push(`Series ${i}`);
+      }
+      headers.push('Total Points');
+
+      const tableRows = [];
+      results.forEach((player, index) => {
+        const row = [
+          index + 1, // Rank
+          `${player.player_name}, ${player.player_id}`
+        ];
+        for (const seriesPoints of Object.values(player.series_points)) {
+          row.push(seriesPoints);
+        }
+        row.push(player.total_points); // Total Points
+        tableRows.push(row);
+      });
+
+      // AutoTable plugin to generate table
+      doc.autoTable({
+        head: [headers],
+        body: tableRows,
+        startY: 30, // Adjust startY to move the table down
+        theme: 'grid',
+        styles: {
+          cellPadding: 1, // Decrease the cell padding to reduce row height
+          fontSize: 10,
+          valign: 'middle', // Change to middle to vertically center the content
+          halign: 'left'
+        },
+        columnStyles: {
+          0: { cellWidth: '10%' },
+          1: { cellWidth: '30%' },
+          2: { cellWidth: '10%' },
+          // Adjust widths of series columns dynamically
+          ...Object.fromEntries([...Array(seriesCount).keys()].map(i => [i + 3, { cellWidth: '10%' }])),
+          [3 + seriesCount]: { cellWidth: '10%' } // Total Points column
+        },
+        alternateRowStyles: {
+          fillColor: [224, 235, 255] // Soft blue background for alternate rows
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold'
+        },
+      });
+
+      doc.save(`Female_Results_Championship_${currentChampionshipID}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF');

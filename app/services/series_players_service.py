@@ -115,6 +115,8 @@ def get_players_overall_points(championship_id):
                 player_info = Player_Model.query.filter_by(PlayerID=player.PlayerID).first()
                 player_points[player.PlayerID] = {
                     'player_name': player_info.name,
+                    'player_sex': player_info.sex,
+                    'player_birthdate': player_info.birthdate,
                     'player_id': player.PlayerID,
                     'total_points': 0,
                     'series_points': {}
@@ -123,6 +125,20 @@ def get_players_overall_points(championship_id):
             player_points[player.PlayerID]['series_points'][series.SeriesID] = player.TotalPoints
 
     return player_points
+
+def get_female_players_overall_points(championship_id):
+    # Get all players' points
+    all_players_points = get_players_overall_points(championship_id)
+
+    # Filter out only female players
+    female_players_points = {
+        player_id: details
+        for player_id, details in all_players_points.items()
+        if details['player_sex'] == 'female'
+    }
+
+    return female_players_points
+
 
 def get_lost_games_service(championship_id):
 # Get all series for the championship

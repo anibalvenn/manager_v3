@@ -35,58 +35,26 @@
   <table class="mt-4 w-full border-b border-gray-200 text-sm">
     <thead class="bg-gray-100">
       <tr>
-        <th class="px-4 py-2 text-left">Subject</th>
-        <th class="px-4 py-2 text-left">Preview</th>
-        <th class="px-4 py-2 text-left">Print</th>
+        <th class="px-4 py-2 text-left text-2xl">
+          Subject
+        </th>
+        <th class="px-4 py-2 text-left text-2xl">
+          <i class="fa-solid fa-eye"></i>
+          Preview
+        </th>
+        <th class="px-4 py-2 text-left text-2xl">
+          <i class="fa-solid fa-print"></i>
+          Print
+        </th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>
-          <h1 class="font-bold text-2xl mx-6">Individual Series Results</h1>
-        </td>
-        <td>
-          <button id="btnPreviewCurrentSeriesResults"
-            class="bg-gray-700 hover:bg-gray-900 text-white px-4 py-1 rounded-md">Preview Current Series
-            Results</button>
-        </td>
-        <td>
-          <button id="btnPrintCurrentSeriesResults"
-            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Current Series
-            Results</button>
-        </td>
-      </tr>
 
       <tr>
         <td>
-          <h1 class="font-bold text-2xl mx-6">Individual Overall Results</h1>
-        </td>
-        <td>
-          <button id="btnPreviewOverallResults"
-            class="bg-gray-700 hover:bg-gray-900 text-white px-4 py-1 rounded-md">Preview Overall Results</button>
-        </td>
-        <td>
-          <button id="btnPrintOverallResults"
-            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Overall Results</button>
-        </td>
-      </tr>
-
-      <tr>
-        <td>
-          <h1 class="font-bold text-2xl mx-6">Teams Overall Results</h1>
-        </td>
-        <td>
-          <button id="btnPreviewOverallTeamsResults"
-            class="bg-gray-700 hover:bg-gray-900 text-white px-4 py-1 rounded-md">Preview Teams Overall Results</button>
-        </td>
-        <td>
-          <button id="btnPrintOverallTeamsResults"
-            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Teams Overall Results</button>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <h1 class="font-bold text-2xl mx-6">Current Series Listen
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-solid fa-star"></i>
+            Current Series Listen
             <span class="text-xs">(Complete)</span>
 
           </h1>
@@ -94,14 +62,17 @@
         <td></td>
         <td>
           <button id="btnPrintCurrentSeriesListen"
-            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Current Series Listen
+            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i class="fa-solid fa-print"></i>
+            Current Series Listen
             <span class="text-xs">(Complete)</span>
           </button>
         </td>
       </tr>
       <tr>
         <td>
-          <h1 class="font-bold text-2xl mx-6">Current Series Listendatei
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-solid fa-star-half"></i>
+            Current Series Listendatei
             <span class="text-xs">(Only Data)</span>
 
           </h1>
@@ -109,7 +80,8 @@
         <td></td>
         <td>
           <button id="btnPrintCurrentSeriesListenDatei"
-            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Current Series Listendatei
+            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i class="fa-solid fa-print"></i>
+            Current Series Listendatei
             <span class="text-xs">(Only Data)</span>
           </button>
         </td>
@@ -117,27 +89,137 @@
       <tr>
         <td>
           <div>
-            <h1 class="font-bold text-2xl mx-6">Player Zettel</h1>
+            <h1 class="font-bold text-2xl mx-6">
+              <i class="fa-solid fa-chair"></i>
+
+              Player Zettel
+            </h1>
             <p class="text-xs mx-6">Individual player note with respective tables and seats</p>
           </div>
         </td>
         <td></td>
         <td>
-          <button id="btnPrintPlayerZettel"
-            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Player Zettel</button>
+          <button id="btnPrintPlayerZettel" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i
+              class="fa-solid fa-print"></i>
+            Player Zettel</button>
         </td>
       </tr>
       <tr>
         <td>
-          <h1 class="font-bold text-2xl mx-6">Lost Games List </h1>
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-solid fa-dollar-sign"></i>
+            Lost Games List
+          </h1>
         </td>
         <td></td>
         <td>
-          <button id="btnPrintLostGamesList"
-            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">Print Lost Games List
+          <button id="btnPrintLostGamesList" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i
+              class="fa-solid fa-print"></i>
+            Lost Games List
           </button>
         </td>
       </tr>
+      <tr>
+        <td>
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-solid fa-note-sticky"></i> Individual Series Results
+          </h1>
+        </td>
+        <td>
+          <button id="btnPreviewCurrentSeriesResults"
+            class="bg-gray-700 hover:bg-gray-900 text-white px-4 py-1 rounded-md">
+            <i class="fa-regular fa-eye"></i>
+            Current Series
+            Results</button>
+        </td>
+        <td>
+          <button id="btnPrintCurrentSeriesResults"
+            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i class="fa-solid fa-print"></i>
+            Current Series
+            Results</button>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-regular fa-map"></i> Individual Overall Results
+          </h1>
+        </td>
+        <td>
+          <button id="btnPreviewOverallResults" class="bg-gray-700 hover:bg-gray-900 text-white px-4 py-1 rounded-md">
+            <i class="fa-regular fa-eye"></i>
+            Overall Results</button>
+        </td>
+        <td>
+          <button id="btnPrintOverallResults" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md">
+            <i class="fa-solid fa-print"></i>
+            Overall Results</button>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-solid fa-users-gear"></i>
+            Teams Overall Results
+          </h1>
+        </td>
+        <td>
+          <button id="btnPreviewOverallTeamsResults"
+            class="bg-gray-700 hover:bg-gray-900 text-white px-4 py-1 rounded-md"> <i class="fa-regular fa-eye"></i>
+            Teams Overall Results</button>
+        </td>
+        <td>
+          <button id="btnPrintOverallTeamsResults"
+            class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i class="fa-solid fa-print"></i>
+            Teams Overall Results</button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-solid fa-person-dress"></i>
+            Frauen Results
+          </h1>
+        </td>
+        <td></td>
+        <td>
+          <button id="btnPrintFrauenResults" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i
+              class="fa-solid fa-print"></i>
+            Frauen Results
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-solid fa-baby"></i> Junior Results
+          </h1>
+        </td>
+        <td></td>
+        <td>
+          <button id="btnPrintJuniorResults" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i
+              class="fa-solid fa-print"></i>
+            Junior Results
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h1 class="font-bold text-2xl mx-6">
+            <i class="fa-solid fa-glasses"></i> Senior Results
+          </h1>
+        </td>
+        <td></td>
+        <td>
+          <button id="btnPrintSeniorResults" class="bg-green-600 hover:bg-green-800 text-white px-4 py-1 rounded-md"> <i
+              class="fa-solid fa-print"></i>
+            Senior Results
+          </button>
+        </td>
+      </tr>
+
     </tbody>
   </table>
 
