@@ -1131,61 +1131,70 @@ document.addEventListener('DOMContentLoaded', function () {
       const championshipInfoX = (pageWidth - doc.getTextWidth(championshipInfo)) / 2;
       doc.text(championshipInfo, championshipInfoX, 26);
   
-      // Determine the number of series by examining the first player's series_lost_games length
       const seriesCount = Object.keys(results[0].series_lost_games).length;
       const headers = ['Player Name'];
       for (let i = 1; i <= seriesCount; i++) {
         headers.push(`S_${i}`);
       }
-      headers.push('Total');
+      headers.push('Verlorene', 'Extra');
   
       const tableRows = [];
-      const seriesTotals = Array(seriesCount + 1).fill(0); // Array to store totals for each series and total column
+      const seriesTotals = Array(seriesCount + 1).fill(0); // To store totals for each series and the total column
+      let totalExtraBons = 0; // Initialize the sum for Extra Bons
   
       results.forEach(player => {
         const row = [player.player_name];
+        let extraBons = 0;
+  
         Object.keys(player.series_lost_games).forEach((key, index) => {
           const gameCount = player.series_lost_games[key];
+          if (gameCount > 3) {
+            extraBons += (gameCount - 3);  // Calculate the extra bons for values greater than 3
+          }
           seriesTotals[index] += gameCount; // Sum each series for the footer
           row.push(gameCount);
         });
+  
         const totalLostGames = player.total_lost_games;
         seriesTotals[seriesCount] += totalLostGames; // Sum the total lost games
-        row.push(totalLostGames);
+        totalExtraBons += extraBons; // Sum the Extra Bons for the footer
+        row.push(totalLostGames, extraBons); // Append total lost games and extra bons
         tableRows.push(row);
       });
   
       // Add footer row
       const footerRow = ['Total per Serie'];
       seriesTotals.forEach(total => footerRow.push(total));
+      footerRow.push(totalExtraBons); // Add the total of Extra Bons to the footer
   
       // AutoTable plugin to generate table
       doc.autoTable({
         head: [headers],
         body: tableRows,
         foot: [footerRow], // Append the footer row to the table data
-        startY: 30, // Adjust startY to move the table down
+        startY: 30,
         theme: 'grid',
         styles: {
-          cellPadding: 1, // Decrease the cell padding to reduce row height
+          cellPadding: 1,
           fontSize: 10,
-          valign: 'middle', // Change to middle to vertically center the content
+          valign: 'middle',
           halign: 'left'
         },
         columnStyles: {
-          0: { cellWidth: '20%' }, // Player Name column
+          0: { cellWidth: '20%' },
           ...Object.fromEntries([...Array(seriesCount).keys()].map(i => [i + 1, { cellWidth: '10%' }])),
-          [1 + seriesCount]: { cellWidth: '10%' } // Total column
+          [1 + seriesCount]: { cellWidth: '10%' }, // Total column
+          [2 + seriesCount]: { cellWidth: '10%' } // Extra Bons column
         },
         headStyles: {
-          fillColor: [211, 211, 211], // Gray background for the header
-          textColor: [0, 0, 0], // Text color black
-          fontStyle: 'bold' // Bold text for the header
+          fillColor: [211, 211, 211],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold'
         },
         footStyles: {
-          fillColor: [211, 211, 211], // Match the header background
-          textColor: [0, 0, 0], // Match the header text color
-          fontStyle: 'bold' // Match the header font style
+          fillColor: [211, 211, 211],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold'
         }
       });
   
@@ -1195,6 +1204,125 @@ document.addEventListener('DOMContentLoaded', function () {
       alert('Failed to generate PDF');
     }
   }
+  
+  async function generatePDFLostGamesList() {
+    let currentChampionshipID = localStorage.getItem('currentChampionshipID');
+  
+    if (!currentChampionshipID) {
+      alert("No championship ID found in local storage");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`/api/get_lost_games_list?championship_id=${currentChampionshipID}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+  
+      const data = await response.json();
+      if (!data.success) {
+        console.error('Error:', data.error);
+        return;
+      }
+  
+      const results = data.data;
+      results.sort((a, b) => a.player_name.localeCompare(b.player_name));
+  
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+  
+      // Center the main title
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const title = "Lost Games List";
+      const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
+      doc.setFontSize(18);
+      doc.text(title, titleX, 20);
+  
+      // Add the championship ID below the main title
+      doc.setFontSize(10);
+      const championshipInfo = `Championship ID: ${currentChampionshipID}`;
+      const championshipInfoX = (pageWidth - doc.getTextWidth(championshipInfo)) / 2;
+      doc.text(championshipInfo, championshipInfoX, 26);
+  
+      const seriesCount = Object.keys(results[0].series_lost_games).length;
+      const headers = ['Player Name'];
+      for (let i = 1; i <= seriesCount; i++) {
+        headers.push(`S_${i}`);
+      }
+      headers.push('Verlorene', 'Extra', 'Total');
+  
+      const tableRows = [];
+      const seriesTotals = Array(seriesCount + 1).fill(0); // To store totals for each series and the total column
+      let totalExtraBons = 0; // Initialize the sum for Extra Bons
+      let totalOverall = 0; // Initialize the total for the new "Total" column
+  
+      results.forEach(player => {
+        const row = [player.player_name];
+        let extraBons = 0;
+  
+        Object.keys(player.series_lost_games).forEach((key, index) => {
+          const gameCount = player.series_lost_games[key];
+          if (gameCount > 3) {
+            extraBons += (gameCount - 3);  // Calculate the extra bons for values greater than 3
+          }
+          seriesTotals[index] += gameCount; // Sum each series for the footer
+          row.push(gameCount);
+        });
+  
+        const totalLostGames = player.total_lost_games;
+        seriesTotals[seriesCount] += totalLostGames; // Sum the total lost games
+        totalExtraBons += extraBons; // Sum the Extra Bons for the footer
+        const playerTotal = totalLostGames + extraBons;
+        totalOverall += playerTotal; // Sum the overall totals for the footer
+        row.push(totalLostGames, extraBons, playerTotal); // Append total lost games, extra bons, and overall total
+        tableRows.push(row);
+      });
+  
+      // Add footer row
+      const footerRow = ['Total per Serie'];
+      seriesTotals.forEach(total => footerRow.push(total));
+      footerRow.push(totalExtraBons); // Add the total of Extra Bons to the footer
+      footerRow.push(totalOverall); // Add the overall total to the footer
+  
+      // AutoTable plugin to generate table
+      doc.autoTable({
+        head: [headers],
+        body: tableRows,
+        foot: [footerRow],
+        startY: 30,
+        theme: 'grid',
+        styles: {
+          cellPadding: 1,
+          fontSize: 10,
+          valign: 'middle',
+          halign: 'left'
+        },
+        columnStyles: {
+          0: { cellWidth: '20%' },
+          ...Object.fromEntries([...Array(seriesCount).keys()].map(i => [i + 1, { cellWidth: '10%' }])),
+          [1 + seriesCount]: { cellWidth: '10%' }, // Total Lost Games column
+          [2 + seriesCount]: { cellWidth: '10%' }, // Extra Bons column
+          [3 + seriesCount]: { cellWidth: '10%' } // Overall Total column
+        },
+        headStyles: {
+          fillColor: [211, 211, 211],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold'
+        },
+        footStyles: {
+          fillColor: [211, 211, 211],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold'
+        }
+      });
+  
+      doc.save(`Lost_Games_List_Championship_${currentChampionshipID}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF');
+    }
+  }
+  
   
   
   
