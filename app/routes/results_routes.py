@@ -10,7 +10,7 @@ import csv
 from io import StringIO
 from app.models.team_members_model import Team_Members_Model
 from app.models.teams_model import Teams_Model
-from app.services.series_players_service import get_female_players_overall_points, get_lost_games_service, get_players_overall_points
+from app.services.series_players_service import get_female_players_overall_points, get_junior_players_overall_points, get_lost_games_service, get_players_overall_points, get_senior_players_overall_points
 
 # Create a Blueprint for series routes
 results_bp = Blueprint('results_bp', __name__)
@@ -172,6 +172,55 @@ def get_frauen_rank():
         # Prepare the JSON result
         # Sort the female players based on 'total_points', descending
         result = sorted(female_points.values(), key=lambda x: x['total_points'], reverse=True)
+        
+        return jsonify(success=True, data=result)
+
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+      
+@results_bp.route('/api/get_junior_rank', methods=['GET'])
+@login_required
+def get_junior_rank():
+    try:
+        # Get the championship_id from query parameters
+        championship_id = request.args.get('championship_id')
+        date_input = request.args.get('date')
+
+        # Ensure championship_id is provided
+        if not championship_id:
+            return jsonify(success=False, error="championship_id is required"), 400
+
+        # Get female player points using the refactored method
+        junior_points = get_junior_players_overall_points(championship_id,date_input=date_input)
+        print('195', junior_points)
+
+        # Prepare the JSON result
+        # Sort the female players based on 'total_points', descending
+        result = sorted(junior_points.values(), key=lambda x: x['total_points'], reverse=True)
+        
+        return jsonify(success=True, data=result)
+
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+      
+@results_bp.route('/api/get_senior_rank', methods=['GET'])
+@login_required
+def get_senior_rank():
+    try:
+        # Get the championship_id from query parameters
+        championship_id = request.args.get('championship_id')
+        date_input = request.args.get('date')
+
+        # Ensure championship_id is provided
+        if not championship_id:
+            return jsonify(success=False, error="championship_id is required"), 400
+
+        # Get female player points using the refactored method
+        senior_points = get_senior_players_overall_points(championship_id,date_input=date_input)
+
+        # Prepare the JSON result
+        # Sort the female players based on 'total_points', descending
+        result = sorted(senior_points.values(), key=lambda x: x['total_points'], reverse=True)
         
         return jsonify(success=True, data=result)
 

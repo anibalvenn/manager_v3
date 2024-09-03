@@ -64,6 +64,55 @@ document.addEventListener('DOMContentLoaded', function () {
     // Get the championship data from the row
     generatePDFLostGamesList(currentChampionshipID)
   });
+  const btnOpenJuniorBirthDateModal = document.getElementById('btnOpenJuniorBirthDateModal');
+  btnOpenJuniorBirthDateModal.addEventListener('click', () => {
+    // Get the championship data from the row
+    openSelectJuniorBirthDate()
+  });
+  const closeModalSelectJuniorBirthDate = document.getElementById('closeModalSelectJuniorBirthDate');
+  closeModalSelectJuniorBirthDate.addEventListener('click', () => {
+    // Get the championship data from the row
+    closeSelectJuniorBirthDate()
+  });
+  const btnOpenSeniorBirthDateModal = document.getElementById('btnOpenSeniorBirthDateModal');
+  btnOpenSeniorBirthDateModal.addEventListener('click', () => {
+    // Get the championship data from the row
+    openSelectSeniorBirthDate()
+  });
+  const closeModalSelectSeniorBirthDate = document.getElementById('closeModalSelectSeniorBirthDate');
+  closeModalSelectSeniorBirthDate.addEventListener('click', () => {
+    // Get the championship data from the row
+    closeSelectSeniorBirthDate()
+  });
+
+  const btnSubmitJuniorBirthDate = document.getElementById('btnSubmitJuniorBirthDate');
+  btnSubmitJuniorBirthDate.addEventListener('click', () => {
+    const dateInput = document.getElementById('inputSelectJuniorBirthDate').value;
+
+    // Check if the date is valid
+    if (!dateInput || isNaN(Date.parse(dateInput))) {
+      alert('Please enter a valid date.');
+    } else {
+      // If the date is valid, invoke the submitJuniorBirthDate method
+      generateJuniorResults(dateInput);
+    }
+    closeSelectJuniorBirthDate()
+  });
+  const btnSubmitSeniorBirthDate = document.getElementById('btnSubmitSeniorBirthDate');
+  btnSubmitSeniorBirthDate.addEventListener('click', () => {
+    const dateInput = document.getElementById('inputSelectSeniorBirthDate').value;
+
+    // Check if the date is valid
+    if (!dateInput || isNaN(Date.parse(dateInput))) {
+      alert('Please enter a valid date.');
+    } else {
+      // If the date is valid, invoke the submitSeniorBirthDate method
+      generateSeniorResults(dateInput);
+    }
+    closeSelectSeniorBirthDate()
+  });
+
+
 
   async function generatePDFSeriesResult() {
     if (!currentSerieID) {
@@ -493,6 +542,196 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       doc.save(`Female_Results_Championship_${currentChampionshipID}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF');
+    }
+  }
+  async function generateJuniorResults(dateInput) {
+    let currentChampionshipID = localStorage.getItem('currentChampionshipID');
+
+    if (!currentChampionshipID) {
+      alert("No championship ID found in local storage");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/get_junior_rank?championship_id=${currentChampionshipID}&date=${encodeURIComponent(dateInput)}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        console.error('Error:', data.error);
+        return;
+      }
+
+      const results = data.data;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Center the main title
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const title = "Junior Results";
+      const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
+      doc.setFontSize(18);
+      doc.text(title, titleX, 20);
+
+      // Add the championship ID below the main title
+      doc.setFontSize(10);
+      const championshipInfo = `Championship ID: ${currentChampionshipID}`;
+      const championshipInfoX = (pageWidth - doc.getTextWidth(championshipInfo)) / 2;
+      doc.text(championshipInfo, championshipInfoX, 26);
+
+      // Prepare table data
+      const headers = ['Rank', 'Player Name'];
+      const seriesCount = Object.keys(results[0].series_points).length;
+      for (let i = 1; i <= seriesCount; i++) {
+        headers.push(`Series ${i}`);
+      }
+      headers.push('Total Points');
+
+      const tableRows = [];
+      results.forEach((player, index) => {
+        const row = [
+          index + 1, // Rank
+          `${player.player_name}, ${player.player_id}`
+        ];
+        for (const seriesPoints of Object.values(player.series_points)) {
+          row.push(seriesPoints);
+        }
+        row.push(player.total_points); // Total Points
+        tableRows.push(row);
+      });
+
+      // AutoTable plugin to generate table
+      doc.autoTable({
+        head: [headers],
+        body: tableRows,
+        startY: 30, // Adjust startY to move the table down
+        theme: 'grid',
+        styles: {
+          cellPadding: 1, // Decrease the cell padding to reduce row height
+          fontSize: 10,
+          valign: 'middle', // Change to middle to vertically center the content
+          halign: 'left'
+        },
+        columnStyles: {
+          0: { cellWidth: '10%' },
+          1: { cellWidth: '30%' },
+          2: { cellWidth: '10%' },
+          // Adjust widths of series columns dynamically
+          ...Object.fromEntries([...Array(seriesCount).keys()].map(i => [i + 3, { cellWidth: '10%' }])),
+          [3 + seriesCount]: { cellWidth: '10%' } // Total Points column
+        },
+        alternateRowStyles: {
+          fillColor: [224, 235, 255] // Soft blue background for alternate rows
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold'
+        },
+      });
+
+      doc.save(`Junior_Results_Championship_${currentChampionshipID}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF');
+    }
+  }
+  async function generateSeniorResults(dateInput) {
+    let currentChampionshipID = localStorage.getItem('currentChampionshipID');
+
+    if (!currentChampionshipID) {
+      alert("No championship ID found in local storage");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/get_senior_rank?championship_id=${currentChampionshipID}&date=${encodeURIComponent(dateInput)}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        console.error('Error:', data.error);
+        return;
+      }
+
+      const results = data.data;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Center the main title
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const title = "Senior Results";
+      const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
+      doc.setFontSize(18);
+      doc.text(title, titleX, 20);
+
+      // Add the championship ID below the main title
+      doc.setFontSize(10);
+      const championshipInfo = `Championship ID: ${currentChampionshipID}`;
+      const championshipInfoX = (pageWidth - doc.getTextWidth(championshipInfo)) / 2;
+      doc.text(championshipInfo, championshipInfoX, 26);
+
+      // Prepare table data
+      const headers = ['Rank', 'Player Name'];
+      const seriesCount = Object.keys(results[0].series_points).length;
+      for (let i = 1; i <= seriesCount; i++) {
+        headers.push(`Series ${i}`);
+      }
+      headers.push('Total Points');
+
+      const tableRows = [];
+      results.forEach((player, index) => {
+        const row = [
+          index + 1, // Rank
+          `${player.player_name}, ${player.player_id}`
+        ];
+        for (const seriesPoints of Object.values(player.series_points)) {
+          row.push(seriesPoints);
+        }
+        row.push(player.total_points); // Total Points
+        tableRows.push(row);
+      });
+
+      // AutoTable plugin to generate table
+      doc.autoTable({
+        head: [headers],
+        body: tableRows,
+        startY: 30, // Adjust startY to move the table down
+        theme: 'grid',
+        styles: {
+          cellPadding: 1, // Decrease the cell padding to reduce row height
+          fontSize: 10,
+          valign: 'middle', // Change to middle to vertically center the content
+          halign: 'left'
+        },
+        columnStyles: {
+          0: { cellWidth: '10%' },
+          1: { cellWidth: '30%' },
+          2: { cellWidth: '10%' },
+          // Adjust widths of series columns dynamically
+          ...Object.fromEntries([...Array(seriesCount).keys()].map(i => [i + 3, { cellWidth: '10%' }])),
+          [3 + seriesCount]: { cellWidth: '10%' } // Total Points column
+        },
+        alternateRowStyles: {
+          fillColor: [224, 235, 255] // Soft blue background for alternate rows
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold'
+        },
+      });
+
+      doc.save(`Senior_Results_Championship_${currentChampionshipID}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF');
@@ -1023,7 +1262,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-
   async function generateOverallTeamsSeriesResultsPDF(championshipId) {
     const data = await getOverallTeamsSeriesResults(championshipId);
 
@@ -1181,8 +1419,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-
-
   function generatePlayerZettelPDF(championshipId) {
 
     if (championshipId) {
@@ -1194,172 +1430,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
   async function generatePDFLostGamesList() {
     let currentChampionshipID = localStorage.getItem('currentChampionshipID');
-  
+
     if (!currentChampionshipID) {
       alert("No championship ID found in local storage");
       return;
     }
-  
+
     try {
       const response = await fetch(`/api/get_lost_games_list?championship_id=${currentChampionshipID}`);
       if (!response.ok) {
         throw new Error('Network response was not ok ' + response.statusText);
       }
-  
+
       const data = await response.json();
       if (!data.success) {
         console.error('Error:', data.error);
         return;
       }
-  
+
       const results = data.data;
       results.sort((a, b) => a.player_name.localeCompare(b.player_name));
-  
+
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-  
+
       // Center the main title
       const pageWidth = doc.internal.pageSize.getWidth();
       const title = "Lost Games List";
       const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
       doc.setFontSize(18);
       doc.text(title, titleX, 20);
-  
+
       // Add the championship ID below the main title
       doc.setFontSize(10);
       const championshipInfo = `Championship ID: ${currentChampionshipID}`;
       const championshipInfoX = (pageWidth - doc.getTextWidth(championshipInfo)) / 2;
       doc.text(championshipInfo, championshipInfoX, 26);
-  
-      const seriesCount = Object.keys(results[0].series_lost_games).length;
-      const headers = ['Player Name'];
-      for (let i = 1; i <= seriesCount; i++) {
-        headers.push(`S_${i}`);
-      }
-      headers.push('Verlorene', 'Extra');
-  
-      const tableRows = [];
-      const seriesTotals = Array(seriesCount + 1).fill(0); // To store totals for each series and the total column
-      let totalExtraBons = 0; // Initialize the sum for Extra Bons
-  
-      results.forEach(player => {
-        const row = [player.player_name];
-        let extraBons = 0;
-  
-        Object.keys(player.series_lost_games).forEach((key, index) => {
-          const gameCount = player.series_lost_games[key];
-          if (gameCount > 3) {
-            extraBons += (gameCount - 3);  // Calculate the extra bons for values greater than 3
-          }
-          seriesTotals[index] += gameCount; // Sum each series for the footer
-          row.push(gameCount);
-        });
-  
-        const totalLostGames = player.total_lost_games;
-        seriesTotals[seriesCount] += totalLostGames; // Sum the total lost games
-        totalExtraBons += extraBons; // Sum the Extra Bons for the footer
-        row.push(totalLostGames, extraBons); // Append total lost games and extra bons
-        tableRows.push(row);
-      });
-  
-      // Add footer row
-      const footerRow = ['Total per Serie'];
-      seriesTotals.forEach(total => footerRow.push(total));
-      footerRow.push(totalExtraBons); // Add the total of Extra Bons to the footer
-  
-      // AutoTable plugin to generate table
-      doc.autoTable({
-        head: [headers],
-        body: tableRows,
-        foot: [footerRow], // Append the footer row to the table data
-        startY: 30,
-        theme: 'grid',
-        styles: {
-          cellPadding: 1,
-          fontSize: 10,
-          valign: 'middle',
-          halign: 'left'
-        },
-        columnStyles: {
-          0: { cellWidth: '20%' },
-          ...Object.fromEntries([...Array(seriesCount).keys()].map(i => [i + 1, { cellWidth: '10%' }])),
-          [1 + seriesCount]: { cellWidth: '10%' }, // Total column
-          [2 + seriesCount]: { cellWidth: '10%' } // Extra Bons column
-        },
-        headStyles: {
-          fillColor: [211, 211, 211],
-          textColor: [0, 0, 0],
-          fontStyle: 'bold'
-        },
-        footStyles: {
-          fillColor: [211, 211, 211],
-          textColor: [0, 0, 0],
-          fontStyle: 'bold'
-        }
-      });
-  
-      doc.save(`Lost_Games_List_Championship_${currentChampionshipID}.pdf`);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF');
-    }
-  }
-  
-  async function generatePDFLostGamesList() {
-    let currentChampionshipID = localStorage.getItem('currentChampionshipID');
-  
-    if (!currentChampionshipID) {
-      alert("No championship ID found in local storage");
-      return;
-    }
-  
-    try {
-      const response = await fetch(`/api/get_lost_games_list?championship_id=${currentChampionshipID}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-  
-      const data = await response.json();
-      if (!data.success) {
-        console.error('Error:', data.error);
-        return;
-      }
-  
-      const results = data.data;
-      results.sort((a, b) => a.player_name.localeCompare(b.player_name));
-  
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-  
-      // Center the main title
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const title = "Lost Games List";
-      const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
-      doc.setFontSize(18);
-      doc.text(title, titleX, 20);
-  
-      // Add the championship ID below the main title
-      doc.setFontSize(10);
-      const championshipInfo = `Championship ID: ${currentChampionshipID}`;
-      const championshipInfoX = (pageWidth - doc.getTextWidth(championshipInfo)) / 2;
-      doc.text(championshipInfo, championshipInfoX, 26);
-  
+
       const seriesCount = Object.keys(results[0].series_lost_games).length;
       const headers = ['Player Name'];
       for (let i = 1; i <= seriesCount; i++) {
         headers.push(`S_${i}`);
       }
       headers.push('Verlorene', 'Extra', 'Total');
-  
+
       const tableRows = [];
       const seriesTotals = Array(seriesCount + 1).fill(0); // To store totals for each series and the total column
       let totalExtraBons = 0; // Initialize the sum for Extra Bons
       let totalOverall = 0; // Initialize the total for the new "Total" column
-  
+
       results.forEach(player => {
         const row = [player.player_name];
         let extraBons = 0;
-  
+
         Object.keys(player.series_lost_games).forEach((key, index) => {
           const gameCount = player.series_lost_games[key];
           if (gameCount > 3) {
@@ -1368,7 +1491,7 @@ document.addEventListener('DOMContentLoaded', function () {
           seriesTotals[index] += gameCount; // Sum each series for the footer
           row.push(gameCount);
         });
-  
+
         const totalLostGames = player.total_lost_games;
         seriesTotals[seriesCount] += totalLostGames; // Sum the total lost games
         totalExtraBons += extraBons; // Sum the Extra Bons for the footer
@@ -1377,13 +1500,13 @@ document.addEventListener('DOMContentLoaded', function () {
         row.push(totalLostGames, extraBons, playerTotal); // Append total lost games, extra bons, and overall total
         tableRows.push(row);
       });
-  
+
       // Add footer row
       const footerRow = ['Total per Serie'];
       seriesTotals.forEach(total => footerRow.push(total));
       footerRow.push(totalExtraBons); // Add the total of Extra Bons to the footer
       footerRow.push(totalOverall); // Add the overall total to the footer
-  
+
       // AutoTable plugin to generate table
       doc.autoTable({
         head: [headers],
@@ -1415,17 +1538,38 @@ document.addEventListener('DOMContentLoaded', function () {
           fontStyle: 'bold'
         }
       });
-  
+
       doc.save(`Lost_Games_List_Championship_${currentChampionshipID}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF');
     }
   }
-  
-  
-  
-  
+
+
+
+  function openSelectJuniorBirthDate() {
+    const divSelectJuniorBirthDate = document.getElementById('divSelectJuniorBirthDate');
+    divSelectJuniorBirthDate.classList.remove('hidden');
+  }
+
+  function closeSelectJuniorBirthDate() {
+    document.getElementById('inputSelectJuniorBirthDate').value = '';
+    const divSelectJuniorBirthDate = document.getElementById('divSelectJuniorBirthDate');
+    divSelectJuniorBirthDate.classList.add('hidden');
+  }
+  function openSelectSeniorBirthDate() {
+    const divSelectSeniorBirthDate = document.getElementById('divSelectSeniorBirthDate');
+    divSelectSeniorBirthDate.classList.remove('hidden');
+  }
+
+  function closeSelectSeniorBirthDate() {
+    document.getElementById('inputSelectSeniorBirthDate').value = '';
+    const divSelectSeniorBirthDate = document.getElementById('divSelectSeniorBirthDate');
+    divSelectSeniorBirthDate.classList.add('hidden');
+  }
+
+
 
 
 })

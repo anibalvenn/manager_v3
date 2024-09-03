@@ -5,6 +5,8 @@ from app.models.series_model import Series_Model
 from app.models.series_player_model import Series_Players_Model
 from sqlalchemy import func, desc
 from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
+
 
 
 from app.services.random_3er_series_service import get_player_ids_for_championship
@@ -126,6 +128,43 @@ def get_players_overall_points(championship_id):
 
     return player_points
 
+def get_junior_players_overall_points(championship_id, date_input):
+    # Convert the input date to a date object for comparison
+    input_date = datetime.strptime(date_input, '%Y-%m-%d').date()
+
+    # Get all players' points
+    all_players_points = get_players_overall_points(championship_id)
+
+    junior_players_points = {}
+    for player_id, details in all_players_points.items():
+        player_birthdate = details['player_birthdate']  # This is already a date object
+
+        # Debugging print statements
+        print(f"Comparing player {player_id} with birthdate {player_birthdate} to input date {input_date}")
+
+        if player_birthdate > input_date:
+            junior_players_points[player_id] = details
+
+    return junior_players_points
+
+def get_senior_players_overall_points(championship_id, date_input):
+    # Convert the input date to a date object for comparison
+    input_date = datetime.strptime(date_input, '%Y-%m-%d').date()
+
+    # Get all players' points
+    all_players_points = get_players_overall_points(championship_id)
+
+    senior_players_points = {}
+    for player_id, details in all_players_points.items():
+        player_birthdate = details['player_birthdate']  # This is already a date object
+
+        # Debugging print statements
+
+        if player_birthdate < input_date:
+            senior_players_points[player_id] = details
+
+    return senior_players_points
+
 def get_female_players_overall_points(championship_id):
     # Get all players' points
     all_players_points = get_players_overall_points(championship_id)
@@ -138,7 +177,6 @@ def get_female_players_overall_points(championship_id):
     }
 
     return female_players_points
-
 
 def get_lost_games_service(championship_id):
 # Get all series for the championship
