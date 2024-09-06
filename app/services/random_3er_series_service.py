@@ -80,7 +80,7 @@ def rotate_groups(groups):
 def rotate_group_with_fixed_blind( group, index):
     # """Rotates the group while keeping the position of a player with playerID == -1 fixed."""
     # Find the index of the player with playerID == -1
-    blind_player_index = next((i for i in enumerate(group) if i == -1), None)
+    blind_player_index = next((i for i, player in enumerate(group) if player == -1), None)
 
 
     if blind_player_index is not None:

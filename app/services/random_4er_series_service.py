@@ -13,8 +13,10 @@ def create_4er_random_rounds(random_series_amount, current_championship_ID, curr
         # Use the result of rotate_groups from the previous iteration as input for the next
         player_ids_groups_with_blinds = rotate_groups(player_ids_groups_with_blinds)
         player_groups_to_rounds = player_ids_groups_with_blinds
+        print('16',player_ids_groups_with_blinds)
         
         single_serie_tische_array = generate_one_serie_tische_array(player_groups_to_rounds)
+        print('18',single_serie_tische_array)
         
         championship_serien = Series_Model.select_series(championship_id=current_championship_ID)
         length_existing_serien = len(championship_serien)
@@ -63,7 +65,7 @@ def rotate_groups(groups):
 def rotate_group_with_fixed_blind( group, index):
     # """Rotates the group while keeping the position of a player with playerID == -1 fixed."""
     # Find the index of the player with playerID == -1
-    blind_player_index = next((i for i in enumerate(group) if i == -1), None)
+    blind_player_index = next((i for i, player in enumerate(group) if player == -1), None)
 
     if blind_player_index is not None:
         # Temporarily remove the player with playerID == -1
