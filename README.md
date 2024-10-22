@@ -31,6 +31,10 @@ cd /path/to/project
 ```bash
 python run.py
 ```
+or
+```bash
+python -m app.run
+```
 ### Running with Docker
 
 #### Prerequisites

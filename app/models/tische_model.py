@@ -50,6 +50,18 @@ class Tische_Model(db.Model):
         return False
 
     @classmethod
+    def delete_tische_by_series_id(cls, series_id):
+        """Deletes all tische records from the database for a given series_id."""
+        tische = cls.query.filter_by(SeriesID=series_id).all()
+        if tische:
+            for tisch in tische:
+                db.session.delete(tisch)
+            db.session.commit()
+            return True
+        return False
+
+    
+    @classmethod
     def select_tisch(cls, tisch_id=None, series_id=None):
         """Selects tische based on tisch ID or series ID, sorted by TischID."""
         query = cls.query

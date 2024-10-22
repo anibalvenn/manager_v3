@@ -3,11 +3,15 @@ from flask import Blueprint, request, jsonify
 from flask_login import login_required
 from app import db
 from app.models import Series_Model
+from app.models.championship_model import Championship_Model
 from app.models.series_player_model import Series_Players_Model
 from app.models.tische_model import Tische_Model
+from app.models.user_model import User_Model
 from app.services.random_3er_series_service import create_3er_random_rounds, get_player_ids_for_championship
 from app.services.random_4er_series_service import create_4er_random_rounds
 from app.services.utils import set_initial_values_to_players_into_series
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 # Create a Blueprint for series routes
 series_bp = Blueprint('series_bp', __name__)
@@ -76,35 +80,83 @@ def get_serien(championship_id):
                     for serie in serien]
     return jsonify(serien_data)
 
-@series_bp.route('/delete_serie/<int:serie_id>', methods=['DELETE'])
+# @series_bp.route('/delete_serie/<int:serie_id>', methods=['DELETE'])
+# @login_required
+# def delete_serie(serie_id):
+#     # Wrap operations in a transaction
+#     try:
+#         # Delete the serie itself
+#         serie = Series_Model.query.get(serie_id)
+#         if not serie:
+#             return jsonify({'message': 'Serie not found'}), 404
+
+#         # Delete all entries in series_players and tische associated with the series ID
+#         Series_Players_Model.delete_series_records_by_series_id(serie_id)
+#         Tische_Model.delete_tische_by_series_id(serie_id)
+
+#         # Now delete the serie itself
+#         db.session.delete(serie)
+
+#         # Commit all deletions
+#         db.session.commit()
+#         return jsonify({'message': f'Serie {str(serie.series_name)} and associated records removed successfully'}), 200
+
+#     except Exception as e:
+#         # Rollback transaction if any error occurs
+#         db.session.rollback()
+#         return jsonify({'message': f'Error deleting serie: {str(e)}'}), 500
+
+@series_bp.route('/delete_series', methods=['POST'])
 @login_required
-def delete_serie(serie_id):
-    # Wrap operations in a transaction
-    try:
-        # Delete the serie itself
-        serie = Series_Model.query.get(serie_id)
-        if not serie:
-            return jsonify({'message': 'Serie not found'}), 404
+def delete_series():
+    # Get the JSON data from the request body
+    data = request.get_json()
 
-        # Get all entries for the specified serie ID
-        series_player_entries = Series_Players_Model.query.filter_by(SeriesID=serie_id).all()
-        tische_entries = Tische_Model.query.filter_by(SeriesID=serie_id).all()
+    # Extract password and series_id from the JSON body
+    password = data.get('password')
+    series_id = data.get('series_id')
+    print(password, series_id)
 
-        if series_player_entries or tische_entries:
-            # Prevent deletion if there are associated records
-            return jsonify({'message': 'Cannot delete the serie because it is associated with other records. Please remove the associated records first.'}), 400
+    if not series_id or not password:
+        return jsonify({'message': 'Series ID and password are required'}), 400
 
-        # Delete the serie
-        db.session.delete(serie)
+    # Fetch the series based on the given series ID
+    series = Series_Model.query.get(series_id)
+    
+    if not series:
+        return jsonify({'message': 'Series not found'}), 404
 
-        # Commit the deletion
-        db.session.commit()
-        return jsonify({'message': f'Serie {str(serie.series_name)} removed successfully'}), 200
+    # Fetch the championship the series belongs to
+    championship = Championship_Model.query.get(series.ChampionshipID)
 
-    except Exception as e:
-        # Rollback transaction if any error occurs
-        db.session.rollback()
-        return jsonify({'message': f'Error deleting serie: {str(e)}'}), 500
+    if not championship:
+        return jsonify({'message': 'Championship not found'}), 404
+
+    # Fetch the user who owns the championship (creator)
+    championship_creator = User_Model.query.get(championship.user_id)
+
+    if not championship_creator:
+        return jsonify({'message': 'Championship creator not found'}), 404
+
+    # Check if the provided password matches the championship creator's password
+    if check_password_hash(championship_creator.password, password):
+        # Delete related records from series_players and tische
+        Series_Players_Model.delete_series_records_by_series_id(series_id)
+        Tische_Model.delete_tische_by_series_id(series_id)
+
+        # Now delete the series itself
+        db.session.delete(series)
+
+        # Commit all deletions
+        try:
+            db.session.commit()
+            return jsonify({'success': True, 'message': f'Series {series.series_name} deleted successfully'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Error during deletion: {str(e)}'}), 500
+    else:
+        # If the password is incorrect
+        return jsonify({'message': 'Invalid password or unauthorized action'}), 403
 
 def init_routes(app):
     app.register_blueprint(series_bp)

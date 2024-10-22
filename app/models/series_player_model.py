@@ -47,6 +47,17 @@ class Series_Players_Model(db.Model):
         return False
 
     @classmethod
+    def delete_series_records_by_series_id(cls, series_id):
+        """Deletes all series player records from the database for a given series_id."""
+        records = cls.query.filter_by(SeriesID=series_id).all()
+        if records:
+            for record in records:
+                db.session.delete(record)
+            db.session.commit()
+            return True
+        return False
+   
+    @classmethod
     def select_series_player_records(cls, series_id=None, player_id=None, min_won_games=None, min_lost_games=None, min_table_points=None, min_total_points=None):
         """Selects series player records based on given parameters."""
         query = cls.query

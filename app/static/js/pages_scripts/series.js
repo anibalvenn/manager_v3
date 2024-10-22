@@ -10,6 +10,56 @@ document.addEventListener('DOMContentLoaded', function () {
     spanSeriesCounter.innerText = newValue
     // You can perform further actions with the new value here
   });
+  document.getElementById('closeConfirmSeriesDeletionModal').addEventListener('click', function (event) {
+    hidePasswordModal()
+    // You can perform further actions with the new value here
+  });
+
+  document.getElementById('btnConfirmSeriesDeletion').addEventListener('click', function () {
+    // Get the password value
+    const password = document.getElementById('password').value;
+
+    // Get the series ID from the modal's data attribute
+    const modal = document.getElementById('modalCheckPasswordToSeriesDeletion');
+    const seriesId = modal.getAttribute('data-serie-id');
+
+    // Check if the password and series ID are provided
+    if (!password || !seriesId) {
+      alert('Both password and series ID are required');
+      return;
+    }
+
+    // Send the POST request to the backend
+    fetch('/delete_series', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        password: password,
+        series_id: seriesId
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+
+        if (data.success) {
+          // Find the <tr> with the matching data-serie-id and remove it
+          const rows = document.querySelectorAll('#serienTableBody tr');
+          rows.forEach(row => {
+            if (row.getAttribute('data-serie-id') === seriesId) {
+              row.remove();
+            }
+          });
+          hidePasswordModal()
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  });
+
+
 
   function getSelectedValue() {
     const selectedRadio = document.querySelector('input[name="ranking"]:checked');
@@ -154,16 +204,34 @@ document.addEventListener('DOMContentLoaded', function () {
     simpleSeriesResultsBtn.textContent = 'Insert Results';
     simpleSeriesResultsBtn.className = 'bg-green-600 text-white hover:bg-green-900 px-3 py-1 rounded-md';
     simpleSeriesResultsBtn.addEventListener('click', () => {
-        // Get the championship data from the row
-        const serieRow = simpleSeriesResultsBtn.closest('tr');
-        const serieIdInRow = serieRow.getAttribute('data-serie-id')
-  
-        window.location.href = `/simple_serie_results/${currentChampionshipID}/${serieIdInRow}`;
-  
-      });
+      // Get the championship data from the row
+      const serieRow = simpleSeriesResultsBtn.closest('tr');
+      const serieIdInRow = serieRow.getAttribute('data-serie-id')
+
+      window.location.href = `/simple_serie_results/${currentChampionshipID}/${serieIdInRow}`;
+
+    });
 
     simpleSeriesResultsCell.appendChild(simpleSeriesResultsBtn);
     row.appendChild(simpleSeriesResultsCell);
+
+    const deleteSeriesCell = document.createElement('td');
+    const deleteSeriesBtn = document.createElement('button');
+    deleteSeriesBtn.textContent = 'Delete';
+    deleteSeriesBtn.className = 'bg-red-600 text-white hover:bg-red-900 px-3 py-1 rounded-md';
+    deleteSeriesBtn.addEventListener('click', () => {
+      // Get the championship data from the row
+      const serieRow = deleteSeriesBtn.closest('tr');
+      const serieIdInRow = serieRow.getAttribute('data-serie-id')
+
+      showPasswordModal(serieIdInRow)
+
+      // window.location.href = `/delete_serie/${serieIdInRow}`;
+
+    });
+
+    deleteSeriesCell.appendChild(deleteSeriesBtn);
+    row.appendChild(deleteSeriesCell);
     return row;
 
 
@@ -180,5 +248,23 @@ document.addEventListener('DOMContentLoaded', function () {
       serienTableBody.appendChild(row);
     });
   }
- 
+
 })
+
+// Method to show the modal
+function showPasswordModal(seriesId) {
+  const modal = document.getElementById('modalCheckPasswordToSeriesDeletion');
+  modal.setAttribute('data-serie-id', seriesId)
+  const spanSeriesId = document.getElementById('spanSeriesId');
+  spanSeriesId.innerText = seriesId
+  modal.classList.remove('hidden');  // Remove the 'hidden' class to show the modal
+}
+
+// Method to hide the modal
+function hidePasswordModal() {
+  const modal = document.getElementById('modalCheckPasswordToSeriesDeletion');
+  modal.removeAttribute('data-serie-id')
+  const spanSeriesId = document.getElementById('spanSeriesId');
+  spanSeriesId.innerText = ''
+  modal.classList.add('hidden');  // Add the 'hidden' class to hide the modal
+}

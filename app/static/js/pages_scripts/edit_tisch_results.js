@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   document.getElementById('btnSaveTischResults').addEventListener('click', function () {
     const rows = document.querySelectorAll('#tableTischPlayers tbody tr');
 
-    rows.forEach(row => {
+    const promises = Array.from(rows).map(row => {
       const playerId = row.getAttribute('data-player-id');
       const seriesId = row.getAttribute('data-serie-id');
 
@@ -93,9 +93,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
         won_games: wonGames,
         lost_games: lostGames
       };
-      console.log(data)
+      console.log(data);
 
-      fetch('/update_player_points', {
+      return fetch('/update_player_points', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -106,13 +106,31 @@ document.addEventListener('DOMContentLoaded', (event) => {
         .then(data => {
           if (data.success) {
             console.log(`Player ${playerId} points updated successfully.`);
+            return true;
           } else {
             console.error(`Failed to update points for player ${playerId}: ${data.error}`);
+            return false;
           }
         })
-        .catch(error => console.error(`Error updating points for player ${playerId}: ${error}`));
+        .catch(error => {
+          console.error(`Error updating points for player ${playerId}: ${error}`);
+          return false;
+        });
+    });
+
+    // Use Promise.all to wait for all requests to finish
+    Promise.all(promises).then(results => {
+      // Check if all results were successful
+      const allSuccess = results.every(result => result === true);
+
+      if (allSuccess) {
+        alert('All player points updated successfully!');
+      } else {
+        alert('Some player points failed to update. Please check the console for details.');
+      }
     });
   });
+
 });
 function redirectToTische() {
   window.location.href = '/tische.html';

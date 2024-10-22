@@ -1,4 +1,6 @@
-db/*.csv
+db/*
 *.csv
 venv
 .env
+
+*.db
