@@ -1277,8 +1277,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     data.forEach(team => {
       const headers = [
-        ['Team: ' + team.team_name, ...new Array(team.players.length + 2).fill('')], // Team name header
-        ['Series Name', ...team.players.map(player => `Player ID ${player.player_id}`), 'Total Points'] // Column headers
+        [team.team_name, ...new Array(team.players.length + 2).fill('')], // Team name header
+        ['Player Name / Series', ...team.players.map(player => `${player.player_name}, #${player.player_id}`), 'Total Points'] // Column headers
       ];
       const body = [];
       let teamTotalPoints = 0;
@@ -1316,13 +1316,20 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       doc.autoTable({
-        head: headers,
-        body: body,
-        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 10,
-        theme: 'grid',
-        headStyles: { fillColor: [211, 211, 211] },
-        footStyles: { fillColor: [211, 211, 211] }
+        head: headers, // Table headers
+        body: body,    // Table body rows
+        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 10, // Starting Y position
+        theme: 'grid', // Table theme
+        headStyles: {
+          fillColor: [255, 255, 255], // White background
+          textColor: [0, 0, 0]        // Black text
+        },
+        footStyles: {
+          fillColor: [255, 255, 255], // Optional: White background for footer if needed
+          textColor: [0, 0, 0]        // Optional: Black text for footer
+        }
       });
+
     });
 
     doc.save(`Overall_Teams_Series_Results_${championshipId}.pdf`);
@@ -1380,7 +1387,7 @@ document.addEventListener('DOMContentLoaded', function () {
           // Placeholder values for the new columns, adjust as necessary
           return [
             `Serie ${lastSeriesChar}`,
-            `Tisch ${item.tisch_name.slice(-1)}`,
+            `Tisch ${item.tisch_name.split('_T#').pop()}`,
             item.position,
             '',  // Serie Punkte
             '',  // Gew

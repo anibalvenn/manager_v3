@@ -74,7 +74,7 @@ def rotate_group_with_fixed_blind( group, index):
         blind_player = None
 
     # Rotate the group to the right by 'index' positions
-    group = group[-index:] + group[:-index]
+    group = group[-(index + 1):] + group[:-(index + 1)]
 
     # Reinsert the player with playerID == -1 at its original position if it was removed
     if blind_player is not None:

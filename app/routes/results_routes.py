@@ -365,8 +365,11 @@ def get_teams_results():
             team_members = Team_Members_Model.select_team_members(team_id=team.TeamID)
 
             for member in team_members:
+
+                player = Player_Model.select_player(player_id=member.PlayerID)
                 player_info = {
                     'player_id': member.PlayerID,
+                    'player_name': player.name,
                     'series_points': []
                 }
 
