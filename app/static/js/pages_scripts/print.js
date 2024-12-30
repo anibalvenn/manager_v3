@@ -787,20 +787,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const seriesLabel = labels.seriesLabel
         const todayDate = getCurrentDateFormatted()
         if (numPlayers == 4) {
-          page.drawText(`${todayDate}`, { x: 110, y: 760, size: 12 });
-          page.drawText(`${tischLabel}`, { x: 535, y: 760, size: 20 });
-          page.drawText(`${seriesLabel}`, { x: 455, y: 760, size: 20 });
+          page.drawText(`${todayDate}`, { x: 90, y: 741, size: 12 });
+          page.drawText(`${seriesLabel}`, { x: 440, y: 741, size: 20 });
+          page.drawText(`${tischLabel}`, { x: 520, y: 741, size: 20 });
           // Customize the template page with the tisch and player data
-          page.drawText(`${tisch.tischName}`, { x: 200, y: 760, size: 12 });
-          page.drawText(`, T_ID: ${tisch.tischID}`, { x: 320, y: 760, size: 6 });
-          page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 261, y: 738, size: 8 });
-          page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 341, y: 738, size: 8 });
-          page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 421, y: 738, size: 8 });
-          page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 501, y: 738, size: 8 });
-          page.drawText(`${tisch.idPosA}`, { x: 300, y: 717, size: 14 });
-          page.drawText(`${tisch.idPosB}`, { x: 380, y: 717, size: 14 });
-          page.drawText(`${tisch.idPosC}`, { x: 460, y: 717, size: 14 });
-          page.drawText(`${tisch.idPosD}`, { x: 540, y: 717, size: 14 });
+          page.drawText(`${tisch.tischName}`, { x: 200, y: 741, size: 12 });
+          page.drawText(`, T_ID: ${tisch.tischID}`, { x: 320, y: 741, size: 6 });
+          page.drawText(`${truncateString(tisch.namePosA, 15)}`, { x: 244, y: 718, size: 10 });
+          page.drawText(`${truncateString(tisch.namePosB, 15)}`, { x: 324, y: 718, size: 10 });
+          page.drawText(`${truncateString(tisch.namePosC, 15)}`, { x: 404, y: 718, size: 10 });
+          page.drawText(`${truncateString(tisch.namePosD, 15)}`, { x: 484, y: 718, size: 10 });
+          page.drawText(`${tisch.idPosA}`, { x: 290, y: 697, size: 18 });
+          page.drawText(`${tisch.idPosB}`, { x: 370, y: 697, size: 18 });
+          page.drawText(`${tisch.idPosC}`, { x: 450, y: 697, size: 18 });
+          page.drawText(`${tisch.idPosD}`, { x: 530, y: 697, size: 18 });
 
 
         }
