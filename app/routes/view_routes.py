@@ -46,6 +46,12 @@ def init_routes(app):
     @login_required
     def print_page_html():
         return render_template('print.html')
+    
+    @app.route('/prize_distribution.html')
+    @login_required
+    def prize_distribution_page():
+        return render_template('prize_distribution.html')
+    
     @app.route('/i_o.html')
     @login_required
     def i_o():

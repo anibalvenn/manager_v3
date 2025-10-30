@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('change', function (event) {
@@ -29,10 +28,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
                 updatePlayersInTrBackground();
+                updateLineNumbers(); // Update line numbers after reordering
             }
         });
         
     updatePlayersInTrBackground()
+    updateLineNumbers(); // Initial line numbers update
 
 })
 
@@ -62,8 +63,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Loop through each <tr> element
         playerRows.forEach(row => {
             // Get the player name and player ID from the <td> elements inside the <tr>
-            const playerName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-            const playerID = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+            const playerName = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+            const playerID = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
 
             // Check if the player name or player ID contains the search term
             if (playerName.includes(searchTerm) || playerID.includes(searchTerm)) {
@@ -89,8 +90,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Loop through each <tr> element
         playerRows.forEach(row => {
             // Get the player name and player ID from the <td> elements inside the <tr>
-            const playerName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-            const playerID = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+            const playerName = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+            const playerID = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
 
             // Check if the player name or player ID contains the search term
             if (playerName.includes(searchTerm) || playerID.includes(searchTerm)) {
@@ -107,6 +108,31 @@ document.addEventListener('DOMContentLoaded', function () {
     addEventListenersToMoveButtons()
 
 })
+
+// Function to update line numbers in both tables
+function updateLineNumbers() {
+    // Update #tablePlayersIn
+    const tablePlayersIn = document.querySelector('#tablePlayersIn tbody');
+    const rowsIn = tablePlayersIn.querySelectorAll('tr');
+    
+    rowsIn.forEach((row, index) => {
+        const lineNumberCell = row.querySelector('.line-number');
+        if (lineNumberCell) {
+            lineNumberCell.textContent = index + 1;
+        }
+    });
+
+    // Update #tablePlayersOut
+    const tablePlayersOut = document.querySelector('#tablePlayersOut tbody');
+    const rowsOut = tablePlayersOut.querySelectorAll('tr');
+    
+    rowsOut.forEach((row, index) => {
+        const lineNumberCell = row.querySelector('.line-number');
+        if (lineNumberCell) {
+            lineNumberCell.textContent = index + 1;
+        }
+    });
+}
 
 // Function to move a player row to tablePlayersIn
 function movePlayerIn(playerRow) {
@@ -128,6 +154,7 @@ function movePlayerIn(playerRow) {
         movePlayerOut(playerRow);
     });
     updatePlayersInTrBackground()
+    updateLineNumbers(); // Update line numbers after moving player in
 }
 
 // Function to move a player row to tablePlayersOut
@@ -149,6 +176,7 @@ function movePlayerOut(playerRow) {
         movePlayerIn(playerRow);
     });
     updatePlayersInTrBackground()
+    updateLineNumbers(); // Update line numbers after moving player out
 }
 
 // Function to add event listeners to move buttons

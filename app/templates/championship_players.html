@@ -34,7 +34,8 @@
             <table id="tablePlayersIn" class="mt-2 w-full border-b border-gray-200 text-sm " data-championship-id="{{championship_id}}">
               <thead class="bg-gray-100">
                 <tr>
-                  <th class="px-4 text-left w-1/20">x</th> <!-- New column for checkboxes -->
+                  <th class="px-4 text-left w-1/20">_#</th> <!-- New column for line numbers -->
+                  <th class="px-4 text-left w-1/20">x</th>
                   <th class="px-4 text-left w-1/10 text-2xl font-bold">+</th>
                   <th class="px-4 text-left w-3/5">Name</th>
                   <th class="px-4 text-left w-2/20">ID</th>
@@ -44,6 +45,7 @@
               <tbody >
                 {% for player in registered_players %}
                 <tr data-player-id="{{ player.PlayerID }}">
+                  <td class="px-4 line-number"></td> <!-- Line number cell -->
                   <td> <input type="checkbox" class="w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                   </td>
                   <td class="px-4">
@@ -84,6 +86,7 @@
             <table id="tablePlayersOut" class="mt-2 w-full border-b border-gray-200 text-sm" data-championship-id="{{championship_id}}">
               <thead class="bg-gray-100">
                 <tr>
+                  <th class="px-4 text-left w-1/20">_#</th> <!-- New column for line numbers -->
                   <th class="px-4 text-left w-1/20">x</th>
                   <th class="px-4 text-left w-1/10 text-2xl font-bold">+</th>
                   <th class="px-4 text-left w-3/5">Name</th>
@@ -94,6 +97,7 @@
               <tbody>
                 {% for player in unregistered_players %}
                 <tr data-player-id="{{ player.PlayerID }}">
+                  <td class="px-4 line-number"></td> <!-- Line number cell -->
                   <td> <input type="checkbox" class="w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                   </td>
                   <td class="px-4">
